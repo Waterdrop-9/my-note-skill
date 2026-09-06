@@ -1,5 +1,7 @@
 # 学霸笔记 · 组件手册
 
+按所选风格读取对应部分。以下原有文字样式、装饰与动画以 Style A 为主；Style B 的真实类名与片段见 [layouts-journal.md](layouts-journal.md)。Style C 读取文末的语义组件，CSS 以对应模板为准，不能假设 A 的所有类在 B/C 中可用。
+
 ## 文字样式
 
 | 类名 | 效果 | 用途 |
@@ -88,7 +90,7 @@
 
 ## 动画系统
 
-所有内容元素使用 `.write-in` 类实现"书写出现"效果。
+Style A 的内容元素使用 `.write-in` 类实现"书写出现"效果；Style C 正文静态显示，不依赖入场动画。
 
 **动画延迟规则**：
 - 标题：0.1s
@@ -111,3 +113,29 @@
   <div class="content write-in" style="animation-delay:1.0s">内容</div>
 </div>
 ```
+
+## Style C · 稳定语义与复用组件
+
+技术内容先通过 [内容审查](content-checklist.md)，再按 [Deep Study 布局](layouts-deep-study.md) 映射。C 的新卡片共享 `.study-card` 基础样式，不为每种语义重复实现容器。
+
+| 语义 | 类名 | 颜色／结构 | 复用关系 |
+| --- | --- | --- | --- |
+| 普通解释／结构 | `.study-card` | 蓝色 | 基础提示卡 |
+| 承上启下 | `.study-card.transition-card` | 青色 | 同一基础卡片 |
+| 关键洞察 | `.study-card.key-insight` | 橙色 | 同一基础卡片 |
+| 误解／警告 | `.study-card.misconception-card` | 红色 | 同一基础卡片 |
+| 面试压缩 | `.study-card.interview-card` | 红色 | 同一基础卡片；回答回链正文 |
+| 选读扩展 | `.study-card.optional-note` | 紫色 | 同一基础卡片 |
+| 必要高级推导 | `.study-card.derivation-note` | 紫色 | 同一基础卡片；不因此降为选读 |
+| 解法／正面结果 | `.study-card.solution-card` | 绿色 | 同一基础卡片 |
+| 执行过程 | `.study-card.process-card` + `ol` | 青色／有序步骤 | 原流程语义，原生列表 |
+| 原因／依赖链 | `.flow-box` / `.flow-item` / `.flow-arrow` | 青色 | 复用 A L03 的接口 |
+| 本质差异 | `.compare-box.compare-card` / `.compare-row` | 蓝色 | 复用 A L04；compare-card 是语义别名 |
+| 主线回顾 | `.summary-box.summary-card` | 蓝色 | 复用 A L13；summary-card 是语义别名 |
+| 精确公式 | `.formula-card` / `.formula-scroll` | 中性暖灰 | 新增公式与解释容器 |
+| 条件分支 | `.table-scroll` > `.mechanism-table` | 蓝色表头 | 原生 table，窄屏局部横滚 |
+| 代码 | `pre.code-block` > `code` | 深色／等宽 | 复用原代码接口，保留缩进 |
+
+颜色功能稳定，卡片标题同时用文字表达用途。优先级使用 `.priority.core`、`.priority.follow-up`、`.priority.optional` 的可读标签；颜色不自动决定知识优先级。
+
+标题、正文、代码字体及六组语义色统一在 [Style C 模板](../assets/template-deep-study.html) 的 `:root` 中维护。不要为了视觉变化随意换颜色，或给每段添加提示卡。

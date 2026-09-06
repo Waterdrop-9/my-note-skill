@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[笔记标题] · Deep Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&amp;family=Noto+Serif+SC:wght@600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<!-- Optional enhancement: keep CSS, JS and auto-render on the same pinned version. -->
+<link id="math-css" onload="this.dataset.loaded = 'true'" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.18.6/dist/katex.min.css" integrity="sha384-M59ezskvvpvT+a+C1x088YJ3DVmK+wZdX0UkVKalOI4Qi5Nwv0WrvpqHcfa2HQqB" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.18.6/dist/katex.min.js" integrity="sha384-7jGyG5zFwmEamqNWdCbpsPn+GTWEis3lnV7X/jXHyhFpJG7ExABLyMapabg8F4+p" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.18.6/dist/contrib/auto-render.min.js" integrity="sha384-bjyGPfbij8/NDKJhSGZNP/khQVgtHUE5exjm4Ydllo42FwIgYsdLO2lXGmRBf5Mz" crossorigin="anonymous"></script>
+<style>
+  :root {
+    --paper-bg: #faf9f7;
+    --surface: #ffffff;
+    --ink-black: #242522;
+    --ink-muted: #595c57;
+    --border: #dedfd8;
+    --ink-blue: #2454a4; --blue-bg: #eff4fc;
+    --ink-teal: #116d66; --teal-bg: #eff9f6;
+    --ink-orange: #96530e; --orange-bg: #fff7e9;
+    --ink-red: #a52d32; --red-bg: #fff1f1;
+    --ink-green: #226b43; --green-bg: #edf7ef;
+    --ink-purple: #6941a5; --purple-bg: #f5f0fb;
+    --font-title: 'Noto Serif SC', 'Songti SC', 'STSong', serif;
+    --font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    --font-code: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper-bg); color: var(--ink-black);
+    font: 1rem/1.95 var(--font-body); -webkit-font-smoothing: antialiased;
+  }
+  .notebook { max-width: 900px; margin: 0 auto; padding: 52px 36px 96px; }
+  h1, h2, h3, p, figure, pre { margin-top: 0; }
+  h1, h2 { font-family: var(--font-title); line-height: 1.5; }
+  h1 { font-size: clamp(2rem, 5vw, 2.8rem); margin-bottom: 16px; }
+  h2 { font-size: 1.55rem; margin-bottom: 22px; }
+  h3 { font-size: 1.12rem; margin: 28px 0 12px; line-height: 1.65; }
+  p { margin-bottom: 16px; }
+  ul, ol { padding-left: 1.5rem; margin: 12px 0 20px; }
+  li { margin-bottom: 6px; }
+  a { color: var(--ink-blue); text-underline-offset: 4px; overflow-wrap: anywhere; }
+  a:hover { text-decoration-thickness: 2px; }
+  :focus-visible { outline: 3px solid var(--ink-teal); outline-offset: 4px; }
+  .skip-link { position: absolute; left: 12px; top: -100px; background: white; padding: 8px; }
+  .skip-link:focus { top: 12px; }
+  .study-header { padding: 18px 0 32px; margin-bottom: 32px; border-bottom: 2px solid var(--ink-black); }
+  .eyebrow, .section-number { font: 500 .78rem/1.6 var(--font-code); color: var(--ink-blue); letter-spacing: .08em; }
+  .eyebrow { margin-bottom: 18px; }
+  .subtitle { color: var(--ink-muted); font-size: 1.06rem; max-width: 42em; }
+  .study-meta { color: var(--ink-muted); font-size: .85rem; margin: 20px 0 0; }
+  .reading-guide, .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 22px 26px; margin: 26px 0; }
+  .reading-guide h2, .toc h2 { font: 700 .92rem/1.6 var(--font-body); margin-bottom: 14px; }
+  .reading-guide p:last-child { margin-bottom: 0; }
+  .priority { display: inline-block; font: 500 .7rem/1.7 var(--font-code); padding: 2px 8px; border: 1px solid currentColor; border-radius: 4px; vertical-align: middle; }
+  .priority.core { color: var(--ink-blue); background: var(--blue-bg); }
+  .priority.follow-up { color: var(--ink-red); background: var(--red-bg); }
+  .priority.optional { color: var(--ink-purple); background: var(--purple-bg); }
+  .toc ol { columns: 2; column-gap: 32px; margin: 0; }
+  .toc li { break-inside: avoid; font-size: .9rem; }
+  .toc a { color: var(--ink-black); text-decoration: none; }
+  .toc a:hover { color: var(--ink-blue); text-decoration: underline; }
+  .section { margin-top: 54px; scroll-margin-top: 24px; }
+  .section-title { border-bottom: 1px solid var(--border); padding-bottom: 14px; }
+  .section-number { margin-right: 10px; }
+  .content { overflow-wrap: break-word; }
+  /* Existing flow / compare / code / summary hooks are reused with quiet styling. */
+  .flow-box { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 24px 0; padding: 18px; border: 1px solid #bbd8d0; border-radius: 8px; background: var(--teal-bg); }
+  .flow-item { flex: 1 1 120px; padding: 10px; background: var(--surface); border: 1px solid #bbd8d0; border-radius: 5px; text-align: center; font-size: .9rem; }
+  .flow-arrow { color: var(--ink-teal); }
+  .study-card, .compare-box, .summary-box {
+    --card-accent: var(--ink-blue); --card-bg: var(--blue-bg);
+    margin: 22px 0; padding: 19px 23px; border-left: 3px solid var(--card-accent);
+    background: var(--card-bg); border-radius: 0 7px 7px 0;
+  }
+  .card-title { color: var(--card-accent); font: 700 .88rem/1.65 var(--font-body); margin: 0 0 9px; }
+  .study-card > :last-child, .compare-box > :last-child, .summary-box > :last-child { margin-bottom: 0; }
+  .transition-card, .process-card { --card-accent: var(--ink-teal); --card-bg: var(--teal-bg); }
+  .key-insight { --card-accent: var(--ink-orange); --card-bg: var(--orange-bg); }
+  .interview-card, .misconception-card { --card-accent: var(--ink-red); --card-bg: var(--red-bg); }
+  .optional-note, .derivation-note { --card-accent: var(--ink-purple); --card-bg: var(--purple-bg); }
+  .solution-card { --card-accent: var(--ink-green); --card-bg: var(--green-bg); }
+  .compare-row { display: grid; grid-template-columns: 100px minmax(0, 1fr); gap: 16px; margin: 14px 0; }
+  .compare-label { color: var(--ink-blue); font-weight: 700; }
+  .process-card li { padding-left: 6px; margin-bottom: 12px; }
+  .process-card li::marker { color: var(--ink-teal); font-weight: 700; }
+  .formula-card { margin: 24px 0; padding: 22px; background: #f5f4ef; border: 1px solid var(--border); border-radius: 8px; }
+  .formula-scroll { max-width: 100%; overflow-x: auto; padding: 8px 2px; }
+  .formula-body { text-align: center; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .formula-card figcaption { color: var(--ink-muted); font-size: .85rem; margin-top: 14px; }
+  .katex { font-size: 1.08em; }
+  .katex-display { margin: .6em 0; }
+  .symbols { display: grid; grid-template-columns: max-content minmax(0, 1fr); column-gap: 20px; margin: 20px 0; }
+  .symbols dt { font-family: var(--font-code); color: var(--ink-blue); }
+  .symbols dd { margin: 0 0 8px; }
+  .table-scroll { max-width: 100%; overflow-x: auto; margin: 22px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+  caption { text-align: left; font-weight: 700; margin-bottom: 10px; }
+  th, td { text-align: left; vertical-align: top; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+  thead th { color: var(--ink-blue); background: var(--blue-bg); font-size: .81rem; }
+  tbody th { font-weight: 500; }
+  code, pre { font-family: var(--font-code); }
+  code { font-size: .86em; }
+  :not(pre) > code, .code-term { background: #efeee9; padding: 2px 5px; border-radius: 3px; }
+  .code-block { background: #202630; color: #e1e7ef; border-radius: 8px; padding: 22px; margin: 22px 0; line-height: 1.75; overflow-x: auto; tab-size: 4; }
+  .code-block code { font-size: .83rem; background: transparent; padding: 0; }
+  .code-comment { color: #adb9c6; }
+  .mastery { color: var(--ink-muted); font-size: .88rem; border-top: 1px dashed var(--border); padding-top: 14px; margin-top: 24px; }
+  .sources { color: var(--ink-muted); font-size: .88rem; }
+  .study-footer { border-top: 2px solid var(--ink-black); margin-top: 48px; padding-top: 20px; color: var(--ink-muted); font-size: .8rem; }
+  .render-notice { color: var(--ink-red); font-size: .85rem; }
+  [hidden] { display: none !important; }
+  @media (max-width: 600px) {
+    .notebook { padding: 28px 20px 64px; }
+    .study-header { padding-top: 8px; }
+    .section { margin-top: 40px; }
+    .reading-guide, .toc, .study-card, .compare-box, .summary-box, .formula-card { padding: 17px; }
+    .toc ol { columns: 1; }
+    .flow-box { flex-direction: column; align-items: stretch; }
+    .flow-item { flex: auto; }
+    .flow-arrow { transform: rotate(90deg); align-self: center; }
+    .compare-row { grid-template-columns: 1fr; gap: 4px; }
+    .symbols { column-gap: 12px; font-size: .9rem; }
+    .mechanism-table { min-width: 560px; }
+    th, td { padding: 10px; }
+    .code-block { padding: 17px; }
+  }
+  @media print {
+    @page { margin: 16mm; }
+    body { background: white; font-size: 10.5pt; }
+    .notebook { max-width: none; padding: 0; }
+    .skip-link { display: none; }
+    .section { margin-top: 26px; }
+    .study-footer { margin-top: 18px; padding-top: 10px; }
+    h1, h2, h3, .card-title, caption { break-after: avoid; }
+    p { orphans: 3; widows: 3; }
+    .study-card, .formula-card, .compare-box, .summary-box { box-decoration-break: clone; }
+    .code-block { white-space: pre-wrap; overflow-wrap: anywhere; background: #f4f4f4; color: #222; }
+    .code-comment { color: #555; }
+    .table-scroll, .formula-scroll { overflow: visible; }
+    .mechanism-table { min-width: 0; }
+    table { table-layout: fixed; }
+    th, td { overflow-wrap: anywhere; padding: 7px; }
+    thead { display: table-header-group; }
+    tr { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到正文</a>
+<div class="notebook">
+<!-- STUDY CONTENT START: replace this block with the audited draft; components are optional. -->
+<header class="study-header">
+  <p class="eyebrow">DEEP STUDY / [主题领域]</p>
+  <h1>[笔记标题]</h1>
+  <p class="subtitle">[任务、朴素方法的缺口与本笔记的学习目标]</p>
+  <p class="study-meta">已有基础：[读者基础] · 范围：[学习范围] · 阅读安排：[按目标分配]</p>
+</header>
+<aside class="reading-guide" aria-label="阅读优先级">
+  <h2>先抓住主线</h2>
+  <p><span class="priority core">CORE</span> [核心阅读路径和具体掌握标准]</p>
+  <p><span class="priority follow-up">FOLLOW-UP</span> [边界与设计取舍]</p>
+  <p><span class="priority optional">OPTIONAL</span> [扩展的作用，以及何时需要]</p>
+</aside>
+<nav class="toc" aria-label="目录">
+  <h2>阅读路径</h2>
+  <ol><li><a href="#problem">[为什么需要新机制]</a></li><li><a href="#mechanism">[新机制如何补上缺口]</a></li><li><a href="#review">回顾与复述</a></li></ol>
+</nav>
+<main id="main" class="content">
+  <section class="section" id="problem">
+    <h2 class="section-title"><span class="section-number">01</span>[已有方法解决了什么，还缺什么]</h2>
+    <p>[先解释具体任务、已有办法和剩余问题，再引入名称。]</p>
+    <div class="flow-box" aria-label="问题与机制的关系">
+      <span class="flow-item">[已有能力]</span><span class="flow-arrow" aria-hidden="true">→</span>
+      <span class="flow-item">[具体缺口]</span><span class="flow-arrow" aria-hidden="true">→</span>
+      <span class="flow-item">[需要的新能力]</span>
+    </div>
+    <aside class="study-card transition-card">
+      <h3 class="card-title">[为什么下一节应该出现]</h3>
+      <p>[前文的产物如何被使用；尚未解决的问题如何引出下一节。]</p>
+    </aside>
+  </section>
+  <section class="section" id="mechanism">
+    <h2 class="section-title"><span class="section-number">02</span>[机制具体改变了什么]</h2>
+    <p>[公式要回答的问题和直觉。下方公式仅演示渲染，替换为当前主题的必要关系。]</p>
+    <figure class="formula-card">
+      <div class="formula-scroll" role="region" aria-label="核心公式，可横向滚动" tabindex="0">
+        <div class="formula-body">\[\widehat{\mu}_n = \frac{1}{n}\sum_{i=1}^{n}x_i\]</div>
+      </div>
+      <figcaption>[陈述身份、整体含义与成立条件；此处示例为样本均值。]</figcaption>
+    </figure>
+    <dl class="symbols"><dt>\(x_i\)</dt><dd>[符号来源、范围与单位]</dd><dt>\(n\)</dt><dd>[样本量及采样条件]</dd></dl>
+    <p>[关键推导、初学者断点、可复算的例子与边界。按语义选用布局片段，不必全用。]</p>
+    <aside class="study-card key-insight"><h3 class="card-title">关键洞察</h3><p>[具体量如何变化，为什么产生所述效果。]</p></aside>
+    <p class="mastery">掌握到这里：[一个可以独立复述、手推或实现的具体任务。]</p>
+  </section>
+  <section class="section" id="review">
+    <h2 class="section-title"><span class="section-number">03</span>回顾与复述</h2>
+    <div class="summary-box summary-card"><h3 class="card-title">主线回收</h3><p>[问题 → 核心改动 → 效果 → 代价；收回前文问题。]</p></div>
+    <aside class="study-card interview-card"><h3 class="card-title">口述回答 · 按需保留</h3><p>[从正文压缩的结论 → 原因 → 关键边界。]</p><p>[递进追问及要点，链接回 <a href="#mechanism">正文依据</a>。]</p></aside>
+    <aside class="study-card optional-note"><h3 class="card-title"><span class="priority optional">OPTIONAL</span> [扩展主题]</h3><p>[它解决什么额外问题，什么时候值得继续，当前在哪里可以停。]</p></aside>
+  </section>
+  <section class="section sources" id="sources">
+    <h2 class="section-title">参考资料</h2>
+    <p>[替换为当前主题的可靠来源与定位，区分来源事实、教学示例和解释性推导。]</p>
+  </section>
+</main>
+<footer class="study-footer">[主题短名] · Deep Study · <a href="#main">回到正文</a></footer>
+<!-- STUDY CONTENT END -->
+<p id="math-status" class="render-notice" role="status" hidden>部分公式未完成增强排版，保留原始 TeX 与文字解释。请检查公式语法或资源加载后重新打开。</p>
+<noscript><p class="render-notice">JavaScript 未启用：正文可读，公式保留 TeX 表达式。</p></noscript>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const main = document.querySelector('main');
+    const status = document.getElementById('math-status');
+    if (!main || !/\\\(|\\\[|\$\$/.test(main.textContent)) return;
+    // CSS failure must not turn readable source into broken, duplicated math markup.
+    if (typeof renderMathInElement !== 'function' || document.getElementById('math-css').dataset.loaded !== 'true') {
+      status.hidden = false;
+      return;
+    }
+    try {
+      renderMathInElement(main, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '\\[', right: '\\]', display: true},
+          {left: '\\(', right: '\\)', display: false}
+        ],
+        // Auto-render catches parse errors, keeps the TeX, and calls errorCallback.
+        throwOnError: true,
+        trust: false,
+        errorCallback: function () { status.hidden = false; }
+      });
+      if (main.querySelector('.katex-error')) status.hidden = false;
+    } catch (error) {
+      status.hidden = false;
+    }
+  });
+</script>
+</body>
+</html>

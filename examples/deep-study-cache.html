@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>缓存为什么还需要淘汰策略？ · Deep Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&amp;family=Noto+Serif+SC:wght@600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<!-- Optional enhancement: keep CSS, JS and auto-render on the same pinned version. -->
+<link id="math-css" onload="this.dataset.loaded = 'true'" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.18.6/dist/katex.min.css" integrity="sha384-M59ezskvvpvT+a+C1x088YJ3DVmK+wZdX0UkVKalOI4Qi5Nwv0WrvpqHcfa2HQqB" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.18.6/dist/katex.min.js" integrity="sha384-7jGyG5zFwmEamqNWdCbpsPn+GTWEis3lnV7X/jXHyhFpJG7ExABLyMapabg8F4+p" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.18.6/dist/contrib/auto-render.min.js" integrity="sha384-bjyGPfbij8/NDKJhSGZNP/khQVgtHUE5exjm4Ydllo42FwIgYsdLO2lXGmRBf5Mz" crossorigin="anonymous"></script>
+<style>
+  :root {
+    --paper-bg: #faf9f7;
+    --surface: #ffffff;
+    --ink-black: #242522;
+    --ink-muted: #595c57;
+    --border: #dedfd8;
+    --ink-blue: #2454a4; --blue-bg: #eff4fc;
+    --ink-teal: #116d66; --teal-bg: #eff9f6;
+    --ink-orange: #96530e; --orange-bg: #fff7e9;
+    --ink-red: #a52d32; --red-bg: #fff1f1;
+    --ink-green: #226b43; --green-bg: #edf7ef;
+    --ink-purple: #6941a5; --purple-bg: #f5f0fb;
+    --font-title: 'Noto Serif SC', 'Songti SC', 'STSong', serif;
+    --font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    --font-code: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper-bg); color: var(--ink-black);
+    font: 1rem/1.95 var(--font-body); -webkit-font-smoothing: antialiased;
+  }
+  .notebook { max-width: 900px; margin: 0 auto; padding: 52px 36px 96px; }
+  h1, h2, h3, p, figure, pre { margin-top: 0; }
+  h1, h2 { font-family: var(--font-title); line-height: 1.5; }
+  h1 { font-size: clamp(2rem, 5vw, 2.8rem); margin-bottom: 16px; }
+  h2 { font-size: 1.55rem; margin-bottom: 22px; }
+  h3 { font-size: 1.12rem; margin: 28px 0 12px; line-height: 1.65; }
+  p { margin-bottom: 16px; }
+  ul, ol { padding-left: 1.5rem; margin: 12px 0 20px; }
+  li { margin-bottom: 6px; }
+  a { color: var(--ink-blue); text-underline-offset: 4px; overflow-wrap: anywhere; }
+  a:hover { text-decoration-thickness: 2px; }
+  :focus-visible { outline: 3px solid var(--ink-teal); outline-offset: 4px; }
+  .skip-link { position: absolute; left: 12px; top: -100px; background: white; padding: 8px; }
+  .skip-link:focus { top: 12px; }
+  .study-header { padding: 18px 0 32px; margin-bottom: 32px; border-bottom: 2px solid var(--ink-black); }
+  .eyebrow, .section-number { font: 500 .78rem/1.6 var(--font-code); color: var(--ink-blue); letter-spacing: .08em; }
+  .eyebrow { margin-bottom: 18px; }
+  .subtitle { color: var(--ink-muted); font-size: 1.06rem; max-width: 42em; }
+  .study-meta { color: var(--ink-muted); font-size: .85rem; margin: 20px 0 0; }
+  .reading-guide, .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 22px 26px; margin: 26px 0; }
+  .reading-guide h2, .toc h2 { font: 700 .92rem/1.6 var(--font-body); margin-bottom: 14px; }
+  .reading-guide p:last-child { margin-bottom: 0; }
+  .priority { display: inline-block; font: 500 .7rem/1.7 var(--font-code); padding: 2px 8px; border: 1px solid currentColor; border-radius: 4px; vertical-align: middle; }
+  .priority.core { color: var(--ink-blue); background: var(--blue-bg); }
+  .priority.follow-up { color: var(--ink-red); background: var(--red-bg); }
+  .priority.optional { color: var(--ink-purple); background: var(--purple-bg); }
+  .toc ol { columns: 2; column-gap: 32px; margin: 0; }
+  .toc li { break-inside: avoid; font-size: .9rem; }
+  .toc a { color: var(--ink-black); text-decoration: none; }
+  .toc a:hover { color: var(--ink-blue); text-decoration: underline; }
+  .section { margin-top: 54px; scroll-margin-top: 24px; }
+  .section-title { border-bottom: 1px solid var(--border); padding-bottom: 14px; }
+  .section-number { margin-right: 10px; }
+  .content { overflow-wrap: break-word; }
+  /* Existing flow / compare / code / summary hooks are reused with quiet styling. */
+  .flow-box { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 24px 0; padding: 18px; border: 1px solid #bbd8d0; border-radius: 8px; background: var(--teal-bg); }
+  .flow-item { flex: 1 1 120px; padding: 10px; background: var(--surface); border: 1px solid #bbd8d0; border-radius: 5px; text-align: center; font-size: .9rem; }
+  .flow-arrow { color: var(--ink-teal); }
+  .study-card, .compare-box, .summary-box {
+    --card-accent: var(--ink-blue); --card-bg: var(--blue-bg);
+    margin: 22px 0; padding: 19px 23px; border-left: 3px solid var(--card-accent);
+    background: var(--card-bg); border-radius: 0 7px 7px 0;
+  }
+  .card-title { color: var(--card-accent); font: 700 .88rem/1.65 var(--font-body); margin: 0 0 9px; }
+  .study-card > :last-child, .compare-box > :last-child, .summary-box > :last-child { margin-bottom: 0; }
+  .transition-card, .process-card { --card-accent: var(--ink-teal); --card-bg: var(--teal-bg); }
+  .key-insight { --card-accent: var(--ink-orange); --card-bg: var(--orange-bg); }
+  .interview-card, .misconception-card { --card-accent: var(--ink-red); --card-bg: var(--red-bg); }
+  .optional-note, .derivation-note { --card-accent: var(--ink-purple); --card-bg: var(--purple-bg); }
+  .solution-card { --card-accent: var(--ink-green); --card-bg: var(--green-bg); }
+  .compare-row { display: grid; grid-template-columns: 100px minmax(0, 1fr); gap: 16px; margin: 14px 0; }
+  .compare-label { color: var(--ink-blue); font-weight: 700; }
+  .process-card li { padding-left: 6px; margin-bottom: 12px; }
+  .process-card li::marker { color: var(--ink-teal); font-weight: 700; }
+  .formula-card { margin: 24px 0; padding: 22px; background: #f5f4ef; border: 1px solid var(--border); border-radius: 8px; }
+  .formula-scroll { max-width: 100%; overflow-x: auto; padding: 8px 2px; }
+  .formula-body { text-align: center; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .formula-card figcaption { color: var(--ink-muted); font-size: .85rem; margin-top: 14px; }
+  .katex { font-size: 1.08em; }
+  .katex-display { margin: .6em 0; }
+  .symbols { display: grid; grid-template-columns: max-content minmax(0, 1fr); column-gap: 20px; margin: 20px 0; }
+  .symbols dt { font-family: var(--font-code); color: var(--ink-blue); }
+  .symbols dd { margin: 0 0 8px; }
+  .table-scroll { max-width: 100%; overflow-x: auto; margin: 22px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+  caption { text-align: left; font-weight: 700; margin-bottom: 10px; }
+  th, td { text-align: left; vertical-align: top; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+  thead th { color: var(--ink-blue); background: var(--blue-bg); font-size: .81rem; }
+  tbody th { font-weight: 500; }
+  code, pre { font-family: var(--font-code); }
+  code { font-size: .86em; }
+  :not(pre) > code, .code-term { background: #efeee9; padding: 2px 5px; border-radius: 3px; }
+  .code-block { background: #202630; color: #e1e7ef; border-radius: 8px; padding: 22px; margin: 22px 0; line-height: 1.75; overflow-x: auto; tab-size: 4; }
+  .code-block code { font-size: .83rem; background: transparent; padding: 0; }
+  .code-comment { color: #adb9c6; }
+  .mastery { color: var(--ink-muted); font-size: .88rem; border-top: 1px dashed var(--border); padding-top: 14px; margin-top: 24px; }
+  .sources { color: var(--ink-muted); font-size: .88rem; }
+  .study-footer { border-top: 2px solid var(--ink-black); margin-top: 48px; padding-top: 20px; color: var(--ink-muted); font-size: .8rem; }
+  .render-notice { color: var(--ink-red); font-size: .85rem; }
+  [hidden] { display: none !important; }
+  @media (max-width: 600px) {
+    .notebook { padding: 28px 20px 64px; }
+    .study-header { padding-top: 8px; }
+    .section { margin-top: 40px; }
+    .reading-guide, .toc, .study-card, .compare-box, .summary-box, .formula-card { padding: 17px; }
+    .toc ol { columns: 1; }
+    .flow-box { flex-direction: column; align-items: stretch; }
+    .flow-item { flex: auto; }
+    .flow-arrow { transform: rotate(90deg); align-self: center; }
+    .compare-row { grid-template-columns: 1fr; gap: 4px; }
+    .symbols { column-gap: 12px; font-size: .9rem; }
+    .mechanism-table { min-width: 560px; }
+    th, td { padding: 10px; }
+    .code-block { padding: 17px; }
+  }
+  @media print {
+    @page { margin: 16mm; }
+    body { background: white; font-size: 10.5pt; }
+    .notebook { max-width: none; padding: 0; }
+    .skip-link { display: none; }
+    .section { margin-top: 26px; }
+    .study-footer { margin-top: 18px; padding-top: 10px; }
+    h1, h2, h3, .card-title, caption { break-after: avoid; }
+    p { orphans: 3; widows: 3; }
+    .study-card, .formula-card, .compare-box, .summary-box { box-decoration-break: clone; }
+    .code-block { white-space: pre-wrap; overflow-wrap: anywhere; background: #f4f4f4; color: #222; }
+    .code-comment { color: #555; }
+    .table-scroll, .formula-scroll { overflow: visible; }
+    .mechanism-table { min-width: 0; }
+    table { table-layout: fixed; }
+    th, td { overflow-wrap: anywhere; padding: 7px; }
+    thead { display: table-header-group; }
+    tr { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到正文</a>
+<div class="notebook">
+<header class="study-header">
+  <p class="eyebrow">SYSTEMS / STUDY NOTE 01</p>
+  <h1>缓存为什么还需要<br>淘汰策略？</h1>
+  <p class="subtitle">从“重复计算太贵”走到 LRU：先算清楚缓存省了什么，再理解容量、访问次序，以及这条线索为什么会失效。</p>
+  <p class="study-meta">已有基础：字典与基本复杂度 · 目标：机制理解 + 算法面试 · 建议安排：约 20 分钟</p>
+</header>
+<aside class="reading-guide" aria-label="阅读优先级">
+  <h2>先抓住主线</h2>
+  <p><span class="priority core">CORE</span> 读 01–03：能解释动机、手推淘汰、将顺序规则对应到代码。</p>
+  <p><span class="priority follow-up">FOLLOW-UP</span> 读 04，再用 05 复述：成本、失效模式、容量与有效性的区别。</p>
+  <p><span class="priority optional">OPTIONAL</span> 并发控制、失效协议、按字节计容量：知道各自解决什么，遇到真实需求再深入。</p>
+</aside>
+<nav class="toc" aria-label="目录">
+  <h2>阅读路径</h2>
+  <ol>
+    <li><a href="#reuse">少做哪一步才会快？</a></li>
+    <li><a href="#capacity">容量满了，凭什么删这个？</a></li>
+    <li><a href="#implementation">次序怎么变成代码里的状态？</a></li>
+    <li><a href="#limits">最近用过，为什么仍会猜错？</a></li>
+    <li><a href="#review">将理解压缩成口述</a></li>
+    <li><a href="#sources">参考资料与示例范围</a></li>
+  </ol>
+</nav>
+<main id="main" class="content">
+  <p>这里研究一个小而完整的问题：<strong>单线程程序反复请求同一个 key 的稳定结果，如何减少重复计算，同时不让缓存无限增长？</strong>容量按条目数计算，值在本文范围内不变。先理解这个闭环，再考虑真实系统里的额外约束。</p>
+  <div class="flow-box" aria-label="知识链：复用、容量、次序、边界">
+    <span class="flow-item">复用计算结果</span><span class="flow-arrow" aria-hidden="true">→</span>
+    <span class="flow-item">容量要求取舍</span><span class="flow-arrow" aria-hidden="true">→</span>
+    <span class="flow-item">维护访问次序</span><span class="flow-arrow" aria-hidden="true">→</span>
+    <span class="flow-item">检验策略边界</span>
+  </div>
+  <section class="section" id="reuse">
+    <h2 class="section-title"><span class="section-number">01</span>先算清楚：少做哪一步才会快？</h2>
+    <p>假设同一个 key 的结果需要昂贵计算，每次重新算都要付出成本。字典已经能按 key 查值；把算过的结果存起来，下次<strong>命中</strong>就直接返回，少做一次原计算。没有命中仍然要算，因此缓存并不保证每次访问都更快。</p>
+    <p>先用一个教学模型回答“什么情况下值得缓存”：每次查询缓存花 \(t_c\)，未命中后额外计算花 \(t_f\)，命中概率为 \(h\)。暂时忽略插入、顺序维护、并发和延迟波动。每次请求都先查缓存，所以命中总耗时是 \(t_c\)，未命中总耗时是 \(t_c+t_f\)。</p>
+    <figure class="formula-card">
+      <div class="formula-scroll" role="region" aria-label="缓存期望耗时公式，可横向滚动" tabindex="0">
+        <div class="formula-body">\[\begin{aligned}
+\mathbb{E}[T] &amp;= h\,t_c+(1-h)(t_c+t_f)\\
+&amp;= t_c+(1-h)t_f
+\end{aligned}\]</div>
+      </div>
+      <figcaption>简化模型内的等式：将命中与未命中两条互斥且穷尽的路径，按各自概率加权。它不是生产环境的延迟保证。</figcaption>
+    </figure>
+    <dl class="symbols">
+      <dt>\(h\)</dt><dd>命中概率，范围为 0 到 1，由访问分布、容量与策略共同决定。</dd>
+      <dt>\(t_c, t_f\)</dt><dd>缓存查找耗时与未命中后额外计算耗时，使用相同时间单位。</dd>
+      <dt>\(T\)</dt><dd>一次请求的总耗时；\(\mathbb{E}[T]\) 是模型中的期望。</dd>
+    </dl>
+    <p>第二行把<strong>两条路径都要付出的查找成本</strong> \(t_c\) 提了出来。相比每次直接计算的 \(t_f\)，节省的是 \(h t_f-t_c\)：命中省下的计算必须抵得过每次查询缓存的成本。因此在这个模型中，\(t_f&gt;0\) 时只有 \(h&gt;t_c/t_f\) 才更快。</p>
+    <p>构造一个小例子：\(t_c=1\) ms、\(t_f=9\) ms、\(h=0.8\)，期望耗时为 \(1+0.2\times9=2.8\) ms，而直接计算需要 9 ms。若 \(h=0\)，反而要 10 ms。这些是教学数值，不是性能实测。</p>
+    <aside class="study-card key-insight">
+      <h3 class="card-title">关键洞察 · 缓存快在少做了原计算</h3>
+      <p>不是给计算加上“缓存”这个名字就会更快。收益来自命中时省掉的那段工作，代价是查找、存储和维护；第 04 节还会补回这里暂时忽略的成本。</p>
+    </aside>
+    <p>实际观测 \(N\) 次请求，用“命中次数 / \(N\)”得到的是命中率<strong>估计量</strong> \(\widehat h\)。一次序列的统计不是未来访问的保证，访问模式改变后命中率也可能变。</p>
+    <p class="mastery">掌握到这里：能指出命中省掉哪一步、未命中多付哪一步，并解释 h = 0 时为何可能更慢。</p>
+  </section>
+  <section class="section" id="capacity">
+    <h2 class="section-title"><span class="section-number">02</span>容量满了，凭什么删这个？</h2>
+    <aside class="study-card transition-card">
+      <h3 class="card-title">复用解决了重复计算，容量问题还在</h3>
+      <p>前面把计算结果存进字典，但如果所有结果一直保存，空间会持续增长。现在需要补的能力是：<strong>容量用尽时，依据什么决定保留谁？</strong></p>
+    </aside>
+    <p>设容量 \(C=2\)，初始为空，依次访问 A、B、A，再放入 C。按插入顺序，A 比 B 早；但按最后使用时间，B 比 A 久未使用。只允许保留两个条目，我们必须明确采用哪条规则。</p>
+    <div class="compare-box compare-card">
+      <h3 class="card-title">同样的容量，不同的选择依据</h3>
+      <div class="compare-row"><span class="compare-label">FIFO</span><p>依据最初进入缓存的次序，淘汰最早插入的 A。命中不改变插入次序。</p></div>
+      <div class="compare-row"><span class="compare-label">LRU</span><p>依据最后一次使用的次序，淘汰最久未使用的 B。因此命中也必须刷新次序。</p></div>
+    </div>
+    <p><strong>LRU（Least Recently Used）</strong>定义了一个淘汰规则：满时删掉最久未使用的条目。它借用“最近用过的东西可能很快再用”这条线索；这是一种策略假设，不是能预测未来的定理。操作系统中的页面替换也讨论这类基于访问历史的策略。<a href="#source-policy">[1]</a></p>
+    <p>维护一个从“最久未使用”到“最近使用”的次序。查到 key 不仅返回值，还把它移到最近端；未命中则计算并插入最近端，满时先移除最久端。下面按读取请求展开，避免把“更新次序”误记成“每次都淘汰”。</p>
+    <div class="table-scroll" role="region" aria-label="缓存条件分支，可横向滚动" tabindex="0">
+      <table class="mechanism-table">
+        <caption>条件变化后，究竟执行什么？</caption>
+        <thead><tr><th scope="col">条件</th><th scope="col">实际操作</th><th scope="col">结果</th><th scope="col">一句人话</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">命中</th><td>移到最近端，返回值</td><td>容量不变，次序刷新</td><td>用过就重新排队</td></tr>
+          <tr><th scope="row">未命中，未满</th><td>计算成功后插入最近端</td><td>增加一项</td><td>还有位置，直接留下</td></tr>
+          <tr><th scope="row">未命中，已满</th><td>计算成功后删最久项，再插入</td><td>保持容量</td><td>满了才请旧的离开</td></tr>
+          <tr><th scope="row">容量为 0</th><td>计算并返回，不存储</td><td>缓存始终为空</td><td>只计算，不留存</td></tr>
+          <tr><th scope="row">计算失败</th><td>传播异常，不删、不插入</td><td>原缓存不变</td><td>新结果没拿到，先留着旧的</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>手推一次：第三次访问 A 为什么关键？</h3>
+    <div class="table-scroll" role="region" aria-label="LRU 访问序列，可横向滚动" tabindex="0">
+      <table>
+        <caption>C = 2，从空缓存访问 A、B、A、C、B；左旧右新</caption>
+        <thead><tr><th scope="col">请求</th><th scope="col">命中？</th><th scope="col">移除</th><th scope="col">请求结束后的次序</th></tr></thead>
+        <tbody>
+          <tr><td>A</td><td>否</td><td>无</td><td><code>[A]</code></td></tr>
+          <tr><td>B</td><td>否</td><td>无</td><td><code>[A, B]</code></td></tr>
+          <tr><td>A</td><td>是</td><td>无</td><td><code>[B, A]</code></td></tr>
+          <tr><td>C</td><td>否</td><td>B</td><td><code>[A, C]</code></td></tr>
+          <tr><td>B</td><td>否</td><td>A</td><td><code>[C, B]</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>五次访问只有一次命中。第三次 A 把次序从 A、B 改成 B、A，导致随后删除 B。如果只返回值却不换序，就会在后面误删刚访问过的 A。</p>
+    <p>归并起来只有两个主要模式：<strong>命中更新次序，未命中按容量决定是否淘汰。</strong>一句话记忆：“用过就排到最近端，满了才请最久没用的离开。”队伍位置只映射访问次序，不代表条目的价值。</p>
+    <p class="mastery">掌握到这里：能独立手推上述序列，并说明第三步如何决定第四步删除谁。</p>
+  </section>
+  <section class="section" id="implementation">
+    <h2 class="section-title"><span class="section-number">03</span>次序怎么变成代码里的状态？</h2>
+    <p>“满时删谁”的问题已经有答案，但如果每次命中都扫描列表找位置，维护次序本身就会变贵。我们既需要按 key 快速定位，也需要把任意位置的条目快速移到最近端。</p>
+    <p>常见结构是<strong>哈希表保存 key → 节点的索引，双向链表保存访问次序</strong>。命中后通过节点的前后指针把它摘下，再接到尾部，不需要从头找前驱。最久项就在头部。数组在中间移动条目则可能需要搬动多项。</p>
+    <p>在哈希表平均常数查找的假设下，查找、移位与淘汰的<strong>缓存管理</strong>平均为 \(O(1)\)，状态占用 \(O(C)\) 个条目及其元数据。哈希退化或昂贵的 key 操作会改变这个估计；未命中时计算结果的成本不在这个 \(O(1)\) 内。</p>
+    <p>下面用 Python 标准库 <code>OrderedDict</code> 表达同样的顺序操作，省去链表样板。<code>move_to_end(key)</code> 把条目移到末尾，<code>popitem(last=False)</code> 删除首项；这些 API 语义可查官方文档。<a href="#source-python">[2]</a></p>
+    <div class="study-card process-card">
+      <h3 class="card-title">一次请求的执行顺序</h3>
+      <ol>
+        <li><strong>输入 key。</strong>查 <code>items</code>；命中则移到末尾并返回保存的值。</li>
+        <li><strong>未命中时调用 load。</strong>由 <code>load(key)</code> 产生 <code>value</code>。失败时还没修改缓存，因此原状态保留。</li>
+        <li><strong>维护容量与次序。</strong>零容量直接返回；否则满时删首项，再把新条目放到末尾。</li>
+        <li><strong>返回结果。</strong><code>items</code> 留给下一次请求使用，它是跨请求保留的状态。</li>
+      </ol>
+    </div>
+    <p><code>capacity</code> 对应前文 \(C\)，<code>items</code> 始终左旧右新。下方是<strong>教学简化的可运行实现</strong>：key 必须可哈希，<code>load(key)</code> 在本例中提供稳定结果；未实现并发、过期时间或按字节计费。</p>
+    <pre class="code-block"><code id="cache-code">from collections import OrderedDict
+
+
+class LRUCache:
+    def __init__(self, capacity: int):
+        if type(capacity) is not int or capacity &lt; 0:
+            raise ValueError("capacity must be a nonnegative integer")
+        self.capacity = capacity
+        self.items = OrderedDict()
+
+    def get(self, key, load):
+        if key in self.items:
+            # 命中也刷新次序，否则会误删刚访问过的条目。
+            self.items.move_to_end(key)
+            return self.items[key]
+
+        # 先拿到新结果再淘汰，load 失败时保留现有缓存。
+        value = load(key)
+        if self.capacity == 0:
+            return value
+        if len(self.items) == self.capacity:
+            self.items.popitem(last=False)
+        self.items[key] = value
+        return value</code></pre>
+    <aside class="study-card solution-card">
+      <h3 class="card-title">容量和次序的不变量</h3>
+      <p>每次请求结束，条目数不超过 <code>capacity</code>；正容量且请求成功时，最后访问的条目位于末尾。用 <code>key in items</code> 判断命中，因此缓存值为 <code>None</code> 也不会被误当作未命中。</p>
+    </aside>
+    <p class="mastery">掌握到这里：能把条件表的每一行对应到代码，说明为什么先 load、再淘汰，以及命中为什么不调用 load。</p>
+  </section>
+  <section class="section" id="limits">
+    <h2 class="section-title"><span class="section-number">04</span>最近用过，为什么仍会猜错？</h2>
+    <p><span class="priority follow-up">FOLLOW-UP</span> 我们已经能维护容量，但“可以实现”并不等于“所有访问模式下都更快”。现在收回第 01 节暂时忽略的成本，并检验第 02 节使用的线索。</p>
+    <p>代价不仅是保存值：顺序结构还占内存，每次命中也要更新元数据。\(C\) 表示条目数，不保证总字节数固定。真实系统还可能有锁与协调开销，这些都不在开头的简化延迟模型中。</p>
+    <h3>一个足以推翻“一定快”的反例</h3>
+    <p>仍取 \(C=2\)，循环访问 <code>A B C A B C</code>。第一轮结束保存 B、C；再要 A 时删 B，接着要 B 时删 C，再要 C 时删 A。缓存一直在追赶，这个序列从空状态开始<strong>每次都未命中</strong>。</p>
+    <aside class="study-card misconception-card">
+      <h3 class="card-title">容易误解 · LRU 并不保证高命中率</h3>
+      <p>LRU 用近期访问猜后续复用。循环扫描可以让这条线索失效，因此前文的 \(h\) 可能降到零；第 01 节已经说明，零命中时缓存查询反而是额外成本。</p>
+    </aside>
+    <p>另一个边界是<strong>有效性</strong>：LRU 解决容量满时先删谁，TTL 按时间限制缓存值的有效期，两者可以并用。即使时间未到，源数据也可能已经更新；是否返回最新数据还需要相应的失效机制。本文假定值稳定，所以到这里指出缺口，不继续展开分布式协议。</p>
+    <p class="mastery">掌握到这里：能用访问序列说明策略假设如何失效，并分清“空间装不下”与“内容过期了”两个问题。</p>
+  </section>
+  <section class="section" id="review">
+    <h2 class="section-title"><span class="section-number">05</span>将理解压缩成口述</h2>
+    <div class="summary-box summary-card">
+      <h3 class="card-title">主线回收</h3>
+      <p>复用减少昂贵计算；容量迫使我们选择保留谁；LRU 用最近访问决定次序，因此命中也要维护状态；这种维护有成本，而近期访问未必预测未来。每一块都对应前面留下的一个问题。</p>
+    </div>
+    <aside class="study-card interview-card">
+      <h3 class="card-title">口述回答 · 结论、原因、边界</h3>
+      <p>LRU 在有限容量下淘汰最久未使用的条目，用近期访问作为复用线索，所以命中也必须调整次序。哈希索引加双向链表可在通常的哈希假设下做到平均常数时间的管理，但会增加存储和更新开销，循环扫描也可能让它一直不命中。</p>
+      <p><strong>命中不调整会怎样？</strong>用 <a href="#capacity">A、B、A、C</a> 说明：第三次 A 没刷新，随后会误删 A，次序更接近插入顺序。</p>
+      <p><strong>O(1) 包含 load 吗？</strong>不包含，它描述的是<a href="#implementation">缓存管理</a>；原计算有自己的成本。</p>
+      <p><strong>LRU 能保证最新数据吗？</strong>不能；淘汰次序没有判断源数据是否变化，见<a href="#limits">有效性边界</a>。</p>
+    </aside>
+    <aside class="study-card optional-note">
+      <h3 class="card-title"><span class="priority optional">OPTIONAL</span> 在真实缺口出现时再扩展</h3>
+      <p>当并发请求、值会变化或条目大小悬殊成为实际需求，再学并发控制、失效策略和按字节容量。现在知道它们分别补哪种缺口即可，无需先背一套完整缓存架构。</p>
+    </aside>
+  </section>
+  <section class="section sources" id="sources">
+    <h2 class="section-title">参考资料与示例范围</h2>
+    <ol>
+      <li id="source-policy"><a href="https://pages.cs.wisc.edu/~remzi/OSTEP/vm-beyondphys-policy.pdf">Operating Systems: Three Easy Pieces — Beyond Physical Memory: Policies</a>：FIFO、LRU、访问局部性与替换策略。本文将相关思路用于一个简化的应用缓存。</li>
+      <li id="source-python"><a href="https://docs.python.org/3/library/collections.html#ordereddict-objects">Python 官方文档 — OrderedDict objects</a>：这里使用的移动到末尾、从首项移除等 API 语义。</li>
+    </ol>
+    <p>延迟模型、访问序列与代码为本文构造的教学示例／推导；数字不是实测性能。代码的可运行检查见仓库 <code>scripts/check_example.py</code>，覆盖上述次序、零容量、异常和反例。</p>
+  </section>
+</main>
+<footer class="study-footer">note-skill · Deep Study / Systems · <a href="#main">回到正文</a></footer>
+
+<p id="math-status" class="render-notice" role="status" hidden>部分公式未完成增强排版，保留原始 TeX 与文字解释。请检查公式语法或资源加载后重新打开。</p>
+<noscript><p class="render-notice">JavaScript 未启用：正文可读，公式保留 TeX 表达式。</p></noscript>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const main = document.querySelector('main');
+    const status = document.getElementById('math-status');
+    if (!main || !/\\\(|\\\[|\$\$/.test(main.textContent)) return;
+    // CSS failure must not turn readable source into broken, duplicated math markup.
+    if (typeof renderMathInElement !== 'function' || document.getElementById('math-css').dataset.loaded !== 'true') {
+      status.hidden = false;
+      return;
+    }
+    try {
+      renderMathInElement(main, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '\\[', right: '\\]', display: true},
+          {left: '\\(', right: '\\)', display: false}
+        ],
+        // Auto-render catches parse errors, keeps the TeX, and calls errorCallback.
+        throwOnError: true,
+        trust: false,
+        errorCallback: function () { status.hidden = false; }
+      });
+      if (main.querySelector('.katex-error')) status.hidden = false;
+    } catch (error) {
+      status.hidden = false;
+    }
+  });
+</script>
+</body>
+</html>

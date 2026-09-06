@@ -2,6 +2,8 @@
 
 每种布局都是一个可复用的页面骨架。根据笔记内容选择合适的布局组合使用。
 
+这是 Style A 的布局库。技术学习先完成内容审查，再按语义选片段；Style C 复用流程、对比、代码和总结接口，具体见 [layouts-deep-study.md](layouts-deep-study.md)。篇幅由理解需要决定，不因布局删除关键解释。
+
 ---
 
 ## L01 · 封面开场
@@ -163,7 +165,7 @@
 ```html
 <div class="fix-box write-in" style="animation-delay:Xs">
   <div class="fix-row">
-    <span class="fix-icon">&#128295;</span>
+    <span class="fix-icon"><i class="lucide-wrench" aria-hidden="true"></i></span>
     <span>[修复方案描述]</span>
   </div>
 </div>

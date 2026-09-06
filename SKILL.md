@@ -1,131 +1,90 @@
 ---
-name: 学霸笔记
-description: 生成手写笔记本风格的单文件 HTML 学习笔记。当用户需要将技术内容、漏洞分析、知识总结等转化为视觉精美的网页笔记时使用。
-trigger_words:
-  - 学霸笔记
-  - 笔记
-  - 手写笔记
-  - 漏洞笔记
-  - 学习笔记
-  - 网页笔记
-  - HTML笔记
-  - note
-  - notebook style
+name: note-skill
+description: 生成或改写 HTML 学习笔记。技术主题使用 Deep Study，先组织问题驱动的知识链、关键推导和学习优先级，再排版为可复习的长文；也支持原有学霸手写笔记和手账风格。适用于“学习笔记”“学霸笔记”“HTML 笔记”、论文或代码学习笔记，以及面试复习笔记；仅问一个技术问题时不必生成整份笔记。
 ---
 
-# 学霸笔记 Skill
+# note-skill · Deep Technical Study Notes + Visual Notes
 
-生成**手写笔记本风格**的单文件 HTML 学习笔记。
+先组织知识和教学逻辑，再将理解结构渲染成笔记。降低语言理解成本，保留决定理解的机制、数学、实现和边界。
 
-> **⚠️ 硬性约束（P0 级别，必须遵守）**
-> 1. **禁止使用 emoji 作为任何图标或装饰符号** — 所有图标必须使用平面 UI 库（Lucide 或 Remix Icon）
-> 2. **内容页纸的高度不能超过皮革封面的高度** — 如果内容过多，必须压缩精简内容，以模板为参考
+**内容正确性与理解完整性优先于视觉紧凑。** 不得为固定页高、整齐卡片或短篇幅删除关键解释；按 [视觉检查清单](references/checklist.md) 拆页或拆节。
 
----
+## 模式与输出
 
-## 两种模板风格
+| 风格 | 默认选择条件 | 模板 | 布局 |
+| --- | --- | --- | --- |
+| A · 学霸笔记 | 轻量总结、非技术笔记，或明确要求手写风格 | [template.html](assets/template.html) | [layouts.md](references/layouts.md) |
+| B · 手账 / Journal | 明确要求皮革本、手账、翻页 | [template-journal.html](assets/template-journal.html) | [layouts-journal.md](references/layouts-journal.md) |
+| C · Deep Study | 系统学习技术主题、理解算法或机制、技术面试复习 | [template-deep-study.html](assets/template-deep-study.html) | [layouts-deep-study.md](references/layouts-deep-study.md) |
 
-### Style A · 学霸笔记本（默认）
+用户指定的风格优先。技术深度与视觉风格独立：技术学习即使选 A/B，也走内容流程；仅美化已有笔记时保留其事实与范围，流程可以轻量执行，不强加推导和面试题。
 
-**视觉**：米黄横线纸 + 螺旋装订孔 + 胶带/咖啡渍/回形针装饰
-**字体**：Kalam + Patrick Hand + Zeyada
-**图标**：Lucide SVG（`<i class="lucide-xxx"></i>`）
-**交互**：单页滚动，write-in 入场动画
-**适合**：技术笔记、知识点总结、科普内容
+默认交付可直接打开的 HTML，CSS 与必要 JS 内联；尊重明确指定的 Markdown 输出，跳过 HTML 映射和渲染。字体等外部资源不等于离线自包含，按模板检查回退。无需构建工具或前端框架。
 
-```
-assets/template.html
-```
+## 工作流
 
-### Style B · 手账皮革本
+### 1. Understand
 
-**视觉**：皮革封面 + 金属环装订 + 多页翻页
-**字体**：Kalam + Ma Shan Zheng（毛笔）+ Zeyada
-**图标**：Remix Icon（`<i class="ri-xxx-line"></i>`）
-**交互**：翻页交互（键盘←→ / 点击），封面 + 内容页
-**适合**：攻击链分析、漏洞笔记、深度技术研究
+从请求与材料确认或推断主题、已有基础、学习目标、是否面向面试、时间预算、内容来源和期望深度。已有信息足够就继续，只有缺失信息会改变主题或来源范围时才询问。
 
-```
-assets/template-journal.html
-```
+默认读者：有基本编程／数学基础，但第一次系统学习本主题。默认目标：建立完整 picture、掌握核心机制、能回答面试追问。未给时间预算时按核心主线分配篇幅，不凭空设页数上限。
 
----
+**完成条件：** 明确学习范围与读者起点；正文开头简短注明关键假设、目标和阅读优先级。
 
-## 完整工作流
+### 2. Research / Grounding
 
-### Step 1 · 需求澄清
+先读内容来源，再写笔记。读取 [grounding.md](references/grounding.md)：处理论文、PDF、博客、代码、Markdown、网页，区分来源事实、解释性推导和教学示例，记录核心结论的出处及缺口。
 
-如果用户未提供完整内容，需澄清以下问题：
+`笔记.md` 是本仓库的教学设计 exemplar，提炼已放入 references；它和模板示例都不是其他技术主题的事实依据。不要求使用 Skill 的人再次提供该文件。
 
-1. **笔记主题**：标题是什么？副标题？
-2. **风格选择**：Style A（学霸笔记本）还是 Style B（手账皮革本）？
-3. **内容大纲**：有哪些章节/知识点？
-4. **技术术语**：需要高亮的关键词、代码术语？
-5. **视觉元素**：需要哪些组件（流程图、对比框、警告框、代码块等）？
+**完成条件：** 核心机制及适用条件有可靠依据；资料缺口和冲突已处理或明确标出，未核实结论不写成事实。
 
-### Step 2 · 拷贝模板
+### 3. Build Knowledge Chain
 
-```bash
-mkdir -p "项目/XXX/notes"
-# Style A
-cp "<SKILL_ROOT>/assets/template.html" "项目/XXX/notes/index.html"
-# Style B
-cp "<SKILL_ROOT>/assets/template-journal.html" "项目/XXX/notes/index.html"
-```
+读取 [knowledge-chain.md](references/knowledge-chain.md)，先形成简短的内部章节蓝图：每个重要章节写明 Previous / Gap / Bridge / Mechanism / Tradeoff / Next。用真实依赖组织主线，独立路线画分支，教学顺序不冒充历史演进。
 
-**立即修改** `<title>` 标签。
+**完成条件：** 读者知道每个核心概念为什么此刻出现；前文留下的问题有后文落点或明确的范围边界。
 
-### Step 3 · 填充内容
+### 4. Depth Planning
 
-1. **预检**：读取模板的 `<style>` 块，确认所有可用的组件类名。
-2. **选择布局**：
-   - Style A：从 `references/layouts.md` 中选择
-   - Style B：从 `references/layouts-journal.md` 中选择
-3. **使用组件**：从 `references/components.md` 中挑选组件。
-4. **添加装饰图标**：**必须使用平面 UI 库图标**，**绝对禁止使用 emoji**。
-   - Style A：Lucide SVG（`<i class="lucide-xxx"></i>`）
-   - Style B：Remix Icon（`<i class="ri-xxx-line"></i>`）
-5. **控制内容量**：**内容页纸的高度不能超过皮革封面的高度**，如果内容过多，压缩精简。
+读取 [interview-priority.md](references/interview-priority.md)；涉及公式、算法、系统流程或代码时读取 [technical-depth.md](references/technical-depth.md)。为知识点分配 CORE / FOLLOW-UP / OPTIONAL，决定需要推导、核心公式、数值／符号例子、代码、流程、对比或一句扩展介绍中的哪些。
 
-### Step 4 · 对照检查清单自检
+**完成条件：** 难但决定主线的内容留在 CORE；每个核心主题有可观察的掌握标准，篇幅集中于真正的逻辑断点。
 
-生成后，打开 `references/checklist.md` 逐项检查。
+### 5. Draft Content First
 
-### Step 5 · 本地预览
+读取 [pedagogy.md](references/pedagogy.md)，先完成与 HTML 无关的正文草稿。通常从问题到直觉，再到精确机制、必要推导／例子，最后回收直觉和本节结论；按实际知识关系调整，不逐节机械填模块。
 
-直接在浏览器中打开生成的 HTML 文件即可预览。
+先讲清正文，再按目标压缩面试回答。需要校准讲解质量时读取 [exemplars.md](references/exemplars.md)，模仿其组织理由而非主题和措辞。
 
-### Step 6 · 迭代
+**完成条件：** 草稿已有完整解释、必要公式与示例，理论—流程—代码能互相定位；不是等待 HTML 阶段填充的提纲。
 
-根据用户反馈修改，调整内容、样式、动画延迟等。
+### 6. Content Audit
 
----
+读取 [content-checklist.md](references/content-checklist.md)。逐项核对适用的 P0，在内部记录章节证据；不适用项注明原因。失败项返回草稿修正，不能用视觉组件遮盖。
 
-## 设计原则
+**完成条件：** 所有适用 P0 通过，读者可以独立复述核心机制，面试回答能从正文推出。
 
-1. **手写感第一**：字体用 Kalam 系列，模拟真实手写。
-2. **纸质质感**：横线纸 + 装订线 + 阴影。
-3. **装饰克制**：胶带、咖啡渍、涂鸦是点缀，不能喧宾夺主。
-4. **颜色编码**：红=警告/强调、蓝=信息/术语、绿=安全/正面、紫=技术/代码。
-5. **单文件输出**：所有 CSS/JS 内联，浏览器直接打开。
-6. **禁止 emoji**：不使用 emoji 作为图标。Style A 用 Lucide，Style B 用 Remix Icon。
-7. **内容适配**：内容页纸的高度不能超过皮革封面的高度，内容过多时压缩精简。
+### 7. Semantic Layout Mapping
 
----
+只在内容通过审查后，读取所选风格的布局文件和 [components.md](references/components.md) 对应部分。原因—结果用 flow，本质差异用 compare，条件分支用 table，执行顺序用 process，知识缺口用 transition。普通解释保留连贯段落。
 
-## 资源文件结构
+**完成条件：** 组件与知识关系对应；布局容纳正文，未反向删改关键内容。无需每节用齐组件。
 
-```
-note-skill/
-├── SKILL.md                      # 本文件
-├── assets/
-│   ├── template.html             # Style A 模板
-│   └── template-journal.html     # Style B 模板
-└── references/
-    ├── layouts.md                # Style A 布局库
-    ├── layouts-journal.md        # Style B 布局库
-    ├── components.md             # 组件手册
-    └── checklist.md              # 质量检查清单
-```
+### 8. Render HTML
 
-**加载顺序**：SKILL.md → 确定风格 → 读取对应模板 → 参考对应布局文件 → 参考 components.md → 自检 checklist.md
+复制所选模板到用户指定目录；未指定时用 `notes/<主题短名>/index.html`。读取模板 `<style>` 确认可用类名，替换标题、示例正文、目录、来源和占位符。Style B 的示例正文还在底部 `texts` 中，必须一并替换。
+
+保留 A 的纸张／装订／write-in、B 的皮革／翻页系统；C 使用长文版式、稳定语义色、可读公式与代码。图标按需使用 Lucide / Remix Icon 或内联 SVG，不用 emoji 作装饰。C 可完全不用图标。
+
+**完成条件：** HTML 内容与通过审查的草稿一致；标题、公式、变量、代码、来源和章节锚点正确，不残留模板主题。
+
+### 9. Final QA
+
+内容变动后重查 [content-checklist.md](references/content-checklist.md) 受影响项；同时执行 [checklist.md](references/checklist.md) 的通用项及所选风格项。有浏览器时实际预览桌面与窄屏，检查长公式、表格、代码、目录和交互；只有静态检查时如实说明尚未验证的项目。
+
+**完成条件：** 内容与视觉检查均通过。存在未解决的内容 P0 时不宣称成稿通过；可说明缺口并交付明确标注的草稿。
+
+## 最终交付
+
+交付完整笔记和可点击文件路径，不只给提纲；默认不展示内部章节蓝图、草稿过程或审查表。笔记包含大图景、阅读优先级、连贯正文、必要来源与紧凑回顾，面试内容按需出现。多文件输出提供入口和前后链接。说明实际做过的验证和仍影响阅读的限制，未运行的代码不声称已测试。

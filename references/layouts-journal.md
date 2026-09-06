@@ -2,6 +2,8 @@
 
 每种布局都是一个可复用的页面骨架。Style B 使用翻页交互，每个 `.page` 是一页。
 
+先完成内容审查再选布局。当前页通过 `.page.active { position: relative; }` 参与文档流，皮革容器随内容增高；长内容优先按知识关系拆页，不通过删推导或桥接维持固定高度。原模板含主题示例与底部 `texts`，生成笔记时一并替换，示例不能用作事实来源。
+
 ---
 
 ## L01 · 封面
@@ -258,8 +260,8 @@ Style B 使用 JavaScript 控制翻页：
 
 ```javascript
 let currentPage = 0;
-const totalPages = [总页数]; // 包括封面
 const pages = document.querySelectorAll('.page');
+const totalPages = pages.length; // 包括封面，由实际内容取得
 
 function showPage(pageNum) {
     pages.forEach((page, index) => {
@@ -290,3 +292,5 @@ document.addEventListener('keydown', (e) => {
     else if (e.key === 'ArrowLeft') prevPage();
 });
 ```
+
+上面只展示翻页核心逻辑。实际复制模板底部完整脚本，保留上一页／下一页按钮、边界禁用与键盘行为；不用手动维护 `totalPages`。所有新增页面放在 `.pages-container` 内。

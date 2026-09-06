@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+<!-- Original topic text below is a layout example, not a verified source. Replace HTML and texts together. -->
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HTTP/2 攻击链笔记</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Ma+Shan+Zheng&family=Zeyada&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&amp;family=Ma+Shan+Zheng&amp;family=Zeyada&amp;display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
         :root {
@@ -129,7 +130,8 @@
             overflow: hidden;
         }
 
-        .page.active { opacity: 1; pointer-events: all; transform: rotateY(0deg); z-index: 5; }
+        /* The visible page sizes the leather container; long explanations must remain readable. */
+        .page.active { position: relative; opacity: 1; pointer-events: all; transform: rotateY(0deg); z-index: 5; }
         .page.flipped { transform: rotateY(-140deg); opacity: 0; pointer-events: none; }
 
         .page::before {
@@ -331,6 +333,10 @@
             color: var(--ink-light);
             opacity: 0.6;
         }
+
+        .page-controls { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; }
+        .page-controls button:disabled { opacity: 0.5; cursor: default; }
+        .page-controls button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 
         .doodle {
             position: absolute;
@@ -650,6 +656,7 @@
 
         @media (max-width: 768px) {
             .notebook { padding: 20px 15px 20px 30px; }
+            .pages-container { min-height: 500px; }
             .page { padding: 30px 25px 30px 45px; min-height: 500px; }
             .cover-title { font-size: 2.5rem; }
             .handwriting { font-size: 1rem; line-height: 28px; }
@@ -919,8 +926,16 @@
 
     <script>
         let currentPage = 0;
-        const totalPages = 5;
         const pages = document.querySelectorAll('.page');
+        const totalPages = pages.length;
+        const controls = document.createElement('nav');
+        controls.className = 'page-controls';
+        controls.setAttribute('aria-label', '翻页');
+        controls.innerHTML = '<button class="btn-handdrawn" type="button">上一页</button><button class="btn-handdrawn" type="button">下一页</button>';
+        document.querySelector('.notebook').appendChild(controls);
+        const [previousButton, nextButton] = controls.querySelectorAll('button');
+        previousButton.addEventListener('click', prevPage);
+        nextButton.addEventListener('click', nextPage);
 
         const texts = {
             1: `攻击链的核心逻辑：<span class="highlight">HPACK 炸弹</span>触发服务器分配大量内存，再用<span class="highlight">窗口停滞</span>让这些内存永远无法释放。
@@ -961,6 +976,8 @@
                 }
             });
             currentPage = pageNum;
+            previousButton.disabled = pageNum === 0;
+            nextButton.disabled = pageNum === totalPages - 1;
         }
 
         function nextPage() {
@@ -978,9 +995,12 @@
         document.querySelector('.page.cover').addEventListener('click', nextPage);
 
         document.addEventListener('keydown', (e) => {
+            if (e.target.closest('button, a, input, textarea, select, [contenteditable]')) return;
             if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
                 nextPage();
             } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
                 prevPage();
             }
         });
