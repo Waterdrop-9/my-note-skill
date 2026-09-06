@@ -49,8 +49,6 @@
   .study-header { padding: 18px 0 32px; margin-bottom: 32px; border-bottom: 2px solid var(--ink-black); }
   .eyebrow, .section-number { font: 500 .78rem/1.6 var(--font-code); color: var(--ink-blue); letter-spacing: .08em; }
   .eyebrow { margin-bottom: 18px; }
-  .subtitle { color: var(--ink-muted); font-size: 1.06rem; max-width: 42em; }
-  .study-meta { color: var(--ink-muted); font-size: .85rem; margin: 20px 0 0; }
   .reading-guide, .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 22px 26px; margin: 26px 0; }
   .reading-guide h2, .toc h2 { font: 700 .92rem/1.6 var(--font-body); margin-bottom: 14px; }
   .reading-guide p:last-child { margin-bottom: 0; }
@@ -90,6 +88,11 @@
   .formula-scroll { max-width: 100%; overflow-x: auto; padding: 8px 2px; }
   .formula-body { text-align: center; white-space: pre-wrap; overflow-wrap: anywhere; }
   .formula-card figcaption { color: var(--ink-muted); font-size: .85rem; margin-top: 14px; }
+  .source-figure { margin: 30px 0; }
+  .figure-frame { display: block; max-width: 100%; overflow: auto; padding: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+  .source-figure img, .source-figure svg { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+  .source-figure figcaption { color: var(--ink-muted); font-size: .85rem; margin-top: 12px; }
+  .figure-credit { display: block; margin-top: 5px; }
   .katex { font-size: 1.08em; }
   .katex-display { margin: .6em 0; }
   .symbols { display: grid; grid-template-columns: max-content minmax(0, 1fr); column-gap: 20px; margin: 20px 0; }
@@ -136,7 +139,7 @@
     .study-footer { margin-top: 18px; padding-top: 10px; }
     h1, h2, h3, .card-title, caption { break-after: avoid; }
     p { orphans: 3; widows: 3; }
-    .study-card, .formula-card, .compare-box, .summary-box { box-decoration-break: clone; }
+    .study-card, .formula-card, .source-figure, .compare-box, .summary-box { box-decoration-break: clone; }
     .code-block { white-space: pre-wrap; overflow-wrap: anywhere; background: #f4f4f4; color: #222; }
     .code-comment { color: #555; }
     .table-scroll, .formula-scroll { overflow: visible; }
@@ -151,60 +154,22 @@
 <body>
 <a class="skip-link" href="#main">跳到正文</a>
 <div class="notebook">
-<!-- STUDY CONTENT START: replace this block with the audited draft; components are optional. -->
+<!-- STUDY CONTENT START: this is a blank composition canvas, not a required outline. -->
 <header class="study-header">
-  <p class="eyebrow">DEEP STUDY / [主题领域]</p>
+  <p class="eyebrow">DEEP STUDY / [可选领域标签]</p>
   <h1>[笔记标题]</h1>
-  <p class="subtitle">[任务、朴素方法的缺口与本笔记的学习目标]</p>
-  <p class="study-meta">已有基础：[读者基础] · 范围：[学习范围] · 阅读安排：[按目标分配]</p>
 </header>
-<aside class="reading-guide" aria-label="阅读优先级">
-  <h2>先抓住主线</h2>
-  <p><span class="priority core">CORE</span> [核心阅读路径和具体掌握标准]</p>
-  <p><span class="priority follow-up">FOLLOW-UP</span> [边界与设计取舍]</p>
-  <p><span class="priority optional">OPTIONAL</span> [扩展的作用，以及何时需要]</p>
-</aside>
-<nav class="toc" aria-label="目录">
-  <h2>阅读路径</h2>
-  <ol><li><a href="#problem">[为什么需要新机制]</a></li><li><a href="#mechanism">[新机制如何补上缺口]</a></li><li><a href="#review">回顾与复述</a></li></ol>
-</nav>
 <main id="main" class="content">
-  <section class="section" id="problem">
-    <h2 class="section-title"><span class="section-number">01</span>[已有方法解决了什么，还缺什么]</h2>
-    <p>[先解释具体任务、已有办法和剩余问题，再引入名称。]</p>
-    <div class="flow-box" aria-label="问题与机制的关系">
-      <span class="flow-item">[已有能力]</span><span class="flow-arrow" aria-hidden="true">→</span>
-      <span class="flow-item">[具体缺口]</span><span class="flow-arrow" aria-hidden="true">→</span>
-      <span class="flow-item">[需要的新能力]</span>
-    </div>
-    <aside class="study-card transition-card">
-      <h3 class="card-title">[为什么下一节应该出现]</h3>
-      <p>[前文的产物如何被使用；尚未解决的问题如何引出下一节。]</p>
-    </aside>
-  </section>
-  <section class="section" id="mechanism">
-    <h2 class="section-title"><span class="section-number">02</span>[机制具体改变了什么]</h2>
-    <p>[公式要回答的问题和直觉。下方公式仅演示渲染，替换为当前主题的必要关系。]</p>
-    <figure class="formula-card">
-      <div class="formula-scroll" role="region" aria-label="核心公式，可横向滚动" tabindex="0">
-        <div class="formula-body">\[\widehat{\mu}_n = \frac{1}{n}\sum_{i=1}^{n}x_i\]</div>
-      </div>
-      <figcaption>[陈述身份、整体含义与成立条件；此处示例为样本均值。]</figcaption>
-    </figure>
-    <dl class="symbols"><dt>\(x_i\)</dt><dd>[符号来源、范围与单位]</dd><dt>\(n\)</dt><dd>[样本量及采样条件]</dd></dl>
-    <p>[关键推导、初学者断点、可复算的例子与边界。按语义选用布局片段，不必全用。]</p>
-    <aside class="study-card key-insight"><h3 class="card-title">关键洞察</h3><p>[具体量如何变化，为什么产生所述效果。]</p></aside>
-    <p class="mastery">掌握到这里：[一个可以独立复述、手推或实现的具体任务。]</p>
-  </section>
-  <section class="section" id="review">
-    <h2 class="section-title"><span class="section-number">03</span>回顾与复述</h2>
-    <div class="summary-box summary-card"><h3 class="card-title">主线回收</h3><p>[问题 → 核心改动 → 效果 → 代价；收回前文问题。]</p></div>
-    <aside class="study-card interview-card"><h3 class="card-title">口述回答 · 按需保留</h3><p>[从正文压缩的结论 → 原因 → 关键边界。]</p><p>[递进追问及要点，链接回 <a href="#mechanism">正文依据</a>。]</p></aside>
-    <aside class="study-card optional-note"><h3 class="card-title"><span class="priority optional">OPTIONAL</span> [扩展主题]</h3><p>[它解决什么额外问题，什么时候值得继续，当前在哪里可以停。]</p></aside>
+  <!-- Choose sections from the subject's real logic. A derivation, execution trace,
+       comparison, source figure or continuous prose can lead; numbering and TOC are optional.
+       Keep audience assumptions, generation goals and planning metadata out of the page. -->
+  <section class="section" id="start">
+    <h2 class="section-title">[从当前主题最自然的问题、现象或证据开始]</h2>
+    <p>[在这里放通过内容审查的正文；按需使用 references 中的组件，不复制固定组合。]</p>
   </section>
   <section class="section sources" id="sources">
     <h2 class="section-title">参考资料</h2>
-    <p>[替换为当前主题的可靠来源与定位，区分来源事实、教学示例和解释性推导。]</p>
+    <p>[列出实际使用的来源与定位；来源图在图注中同时标明原图、截取或改绘。]</p>
   </section>
 </main>
 <footer class="study-footer">[主题短名] · Deep Study · <a href="#main">回到正文</a></footer>

@@ -12,7 +12,7 @@ Deep Technical Study Notes + Visual Note Generator
 | --- | --- | --- | --- |
 | A · 学霸笔记 | 手写笔记、轻量知识总结、课堂与科普 | 米黄横线纸、螺旋装订、胶带／咖啡渍、write-in 入场 | [template.html](assets/template.html) |
 | B · 手账 / Journal | 明确偏好皮革本、分册记录、翻页阅读 | 皮革封面、金属环、键盘／点击／按钮翻页 | [template-journal.html](assets/template-journal.html) |
-| C · Deep Study | AI、LLM、RL、Transformer、操作系统、编译、数据库、算法、数学等技术学习 | 暖白长文、衬线标题、清晰层级、公式与代码、语义卡片、阅读优先级 | [template-deep-study.html](assets/template-deep-study.html) |
+| C · Deep Study | AI、LLM、RL、Transformer、操作系统、编译、数据库、算法、数学等技术学习 | 暖白长文、公式与代码、来源图表、按内容动态编排 | [template-deep-study.html](assets/template-deep-study.html) |
 
 技术系统学习默认 C，轻量或非技术视觉笔记默认 A，手账／翻页请求选择 B。用户指定优先；技术深度与风格独立，深度内容也可以用 A/B。仅要求美化原文时，保留内容范围，不强加推导和面试题。
 
@@ -29,7 +29,8 @@ Deep Technical Study Notes + Visual Note Generator
 | Technical depth | 保留关键推导，区分定义／估计／近似，对齐公式—流程—变量—代码 |
 | Interview-aware | CORE / FOLLOW-UP / OPTIONAL 分层；面试回答是正文的压缩，有理由和边界 |
 | Content QA | 正文在排版前通过内容 P0 审查，失败先改正文 |
-| Semantic layout | 原因用 flow，差异用 compare，分支用 table，桥接用 transition，而非随机选卡片 |
+| Visual evidence | 关键架构图、曲线、表格或界面可直接复用／截取并本地保存，图注说明来源和读法 |
+| Semantic layout | 先选问题演进、执行路径、数学推导、方法对比、论文证据或代码调用链，再按局部语义选择组件 |
 
 “提高稳定性”“提升效率”不算解释完成：要继续说明哪个量或步骤改变了，为什么有效，以及不这样做会怎样。难但决定理解的内容不能因为难而放进选读；独立路线也不会被硬写成一条历史进化链。
 
@@ -62,7 +63,7 @@ git clone https://github.com/Unclecheng-li/note-skill.git ~/.workbuddy/skills/no
 把下面的旅行记录做成 Style B 皮革手账，保留原文。
 ```
 
-默认读者有基础编程／数学知识，第一次系统学习当前主题；默认目标是建立完整 picture、掌握机制、接住面试追问。默认输出单 HTML，也尊重明确指定的 Markdown。指定来源时遵守来源范围，缺失或冲突的信息会注明。
+默认读者有基础编程／数学知识，第一次系统学习当前主题；默认目标是建立完整 picture、掌握机制、接住面试追问。这些信息只指导生成，不会作为“已有基础／目标／资料范围”显示在页面头部。默认输出单 HTML，也尊重明确指定的 Markdown。指定来源时遵守来源范围，缺失或冲突的信息会注明。
 
 ## 工作流与资源
 
@@ -73,6 +74,7 @@ git clone https://github.com/Unclecheng-li/note-skill.git ~/.workbuddy/skills/no
 | Reference | 何时使用 |
 | --- | --- |
 | [grounding.md](references/grounding.md) | 阅读资料，分清事实、教学示例和风格参考 |
+| [visual-evidence.md](references/visual-evidence.md) | 选择、提取、截图、改绘和引用来源关键图表 |
 | [knowledge-chain.md](references/knowledge-chain.md) | 组织章节、桥接、分支与问题回收 |
 | [interview-priority.md](references/interview-priority.md) | 分配深度、学习 ROI、停止标准与面试压缩 |
 | [technical-depth.md](references/technical-depth.md) | 公式、关键推导、估计量、阶段／变量／代码映射 |
@@ -99,7 +101,7 @@ git clone https://github.com/Unclecheng-li/note-skill.git ~/.workbuddy/skills/no
 | 绿 | 解法与正面结果 | solution-card |
 | 紫 | 高级推导与扩展 | derivation-note、optional-note |
 
-所有提示卡共用基础样式；流程、对比、代码、总结沿用原接口。颜色配合文字标题，不用颜色代替优先级判断。公式采用固定版本 KaTeX，宽表、公式和代码在窄屏局部横滚。
+所有提示卡共用基础样式；流程、对比、代码、总结沿用原接口，并新增带图注和来源的 figure。模板只提供视觉原语，不规定文章大纲：目录、编号、导读、总结和面试卡都按内容与目标选用。颜色配合文字标题，不用颜色代替优先级判断。公式采用固定版本 KaTeX，宽表、公式、代码和来源大图在窄屏局部滚动或打开原尺寸。
 
 默认 HTML 的样式与应用脚本内联，字体、图标与 KaTeX 来自 CDN；**单文件不等于完全离线**。C 在资源缺失／禁用 JS 时保留静态正文和 TeX，但降级不算公式精排通过。严格离线需求可预渲染 MathML 或按需打包资源，不为普通输出新增构建系统。KaTeX 接入方式见其 [官方文档](https://katex.org/docs/autorender.html)。
 

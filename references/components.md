@@ -116,7 +116,7 @@ Style A 的内容元素使用 `.write-in` 类实现"书写出现"效果；Style 
 
 ## Style C · 稳定语义与复用组件
 
-技术内容先通过 [内容审查](content-checklist.md)，再按 [Deep Study 布局](layouts-deep-study.md) 映射。C 的新卡片共享 `.study-card` 基础样式，不为每种语义重复实现容器。
+技术内容先通过 [内容审查](content-checklist.md)，再按 [Deep Study 布局](layouts-deep-study.md) 映射。组件是按需调用的词汇，不是输出清单；不要求每篇出现固定组合，也不要求每节都有卡片。C 的提示卡共享 `.study-card` 基础样式，不为每种语义重复实现容器。
 
 | 语义 | 类名 | 颜色／结构 | 复用关系 |
 | --- | --- | --- | --- |
@@ -133,9 +133,10 @@ Style A 的内容元素使用 `.write-in` 类实现"书写出现"效果；Style 
 | 本质差异 | `.compare-box.compare-card` / `.compare-row` | 蓝色 | 复用 A L04；compare-card 是语义别名 |
 | 主线回顾 | `.summary-box.summary-card` | 蓝色 | 复用 A L13；summary-card 是语义别名 |
 | 精确公式 | `.formula-card` / `.formula-scroll` | 中性暖灰 | 新增公式与解释容器 |
+| 来源视觉证据 | `.source-figure` / `.figure-frame` / `.figure-credit` | 中性边框／原图色 | 原图、截图或忠实改绘，规则见 visual-evidence |
 | 条件分支 | `.table-scroll` > `.mechanism-table` | 蓝色表头 | 原生 table，窄屏局部横滚 |
 | 代码 | `pre.code-block` > `code` | 深色／等宽 | 复用原代码接口，保留缩进 |
 
 颜色功能稳定，卡片标题同时用文字表达用途。优先级使用 `.priority.core`、`.priority.follow-up`、`.priority.optional` 的可读标签；颜色不自动决定知识优先级。
 
-标题、正文、代码字体及六组语义色统一在 [Style C 模板](../assets/template-deep-study.html) 的 `:root` 中维护。不要为了视觉变化随意换颜色，或给每段添加提示卡。
+标题、正文、代码字体及六组语义色统一在 [Style C 模板](../assets/template-deep-study.html) 的 `:root` 中维护。不要为了视觉变化随意换颜色，或给每段添加提示卡。需要更多视觉变化时优先改变信息形状，例如来源图、流程、推导、对比或连续正文，而不是继续堆不同颜色的盒子。

@@ -29,11 +29,13 @@ description: 生成或改写 HTML 学习笔记。技术主题使用 Deep Study�
 
 默认读者：有基本编程／数学基础，但第一次系统学习本主题。默认目标：建立完整 picture、掌握核心机制、能回答面试追问。未给时间预算时按核心主线分配篇幅，不凭空设页数上限。
 
-**完成条件：** 明确学习范围与读者起点；正文开头简短注明关键假设、目标和阅读优先级。
+这些信息属于写作 brief，默认只用于内部决策。不要把“已有基础、目标、时间预算、资料范围、输出深度”等提示原样写进笔记头部，也不要用一段话向读者复述生成任务；只有用户明确要求学习计划或导读时才展示。正文直接进入主题，用自然开篇或图建立 big picture。
+
+**完成条件：** 内部明确学习范围与读者起点，成品不泄露提示词式元信息。
 
 ### 2. Research / Grounding
 
-先读内容来源，再写笔记。读取 [grounding.md](references/grounding.md)：处理论文、PDF、博客、代码、Markdown、网页，区分来源事实、解释性推导和教学示例，记录核心结论的出处及缺口。
+先读内容来源，再写笔记。读取 [grounding.md](references/grounding.md)：处理论文、PDF、博客、代码、Markdown、网页，区分来源事实、解释性推导和教学示例，记录核心结论的出处及缺口。来源包含关键图、架构图、实验曲线、表格或截图，或用视觉能明显减少解释成本时，再读取 [visual-evidence.md](references/visual-evidence.md)，决定复用原图、截取、忠实改绘或不用图。
 
 `笔记.md` 是本仓库的教学设计 exemplar，提炼已放入 references；它和模板示例都不是其他技术主题的事实依据。不要求使用 Skill 的人再次提供该文件。
 
@@ -41,19 +43,19 @@ description: 生成或改写 HTML 学习笔记。技术主题使用 Deep Study�
 
 ### 3. Build Knowledge Chain
 
-读取 [knowledge-chain.md](references/knowledge-chain.md)，先形成简短的内部章节蓝图：每个重要章节写明 Previous / Gap / Bridge / Mechanism / Tradeoff / Next。用真实依赖组织主线，独立路线画分支，教学顺序不冒充历史演进。
+读取 [knowledge-chain.md](references/knowledge-chain.md)，先形成简短的内部章节蓝图：每个重要章节写明 Previous / Gap / Bridge / Mechanism / Tradeoff / Next。用真实依赖组织主线，独立路线画分支，教学顺序不冒充历史演进。该蓝图只约束知识逻辑，不规定成品必须有几节、按固定编号推进或逐节显示相同组件。
 
 **完成条件：** 读者知道每个核心概念为什么此刻出现；前文留下的问题有后文落点或明确的范围边界。
 
 ### 4. Depth Planning
 
-读取 [interview-priority.md](references/interview-priority.md)；涉及公式、算法、系统流程或代码时读取 [technical-depth.md](references/technical-depth.md)。为知识点分配 CORE / FOLLOW-UP / OPTIONAL，决定需要推导、核心公式、数值／符号例子、代码、流程、对比或一句扩展介绍中的哪些。
+读取 [interview-priority.md](references/interview-priority.md)；涉及公式、算法、系统流程或代码时读取 [technical-depth.md](references/technical-depth.md)。在内部为知识点分配 CORE / FOLLOW-UP / OPTIONAL，决定需要推导、核心公式、数值／符号例子、代码、流程、对比、来源图或一句扩展介绍中的哪些。默认不在页面顶部展示完整优先级 brief；只有局部标注能帮助取舍时才显示标签。
 
 **完成条件：** 难但决定主线的内容留在 CORE；每个核心主题有可观察的掌握标准，篇幅集中于真正的逻辑断点。
 
 ### 5. Draft Content First
 
-读取 [pedagogy.md](references/pedagogy.md)，先完成与 HTML 无关的正文草稿。通常从问题到直觉，再到精确机制、必要推导／例子，最后回收直觉和本节结论；按实际知识关系调整，不逐节机械填模块。
+读取 [pedagogy.md](references/pedagogy.md)，先完成与 HTML 无关的正文草稿。通常从问题到直觉，再到精确机制、必要推导／例子，最后回收直觉和本节结论；按实际知识关系调整，不逐节机械填模块。先判断本主题最适合由问题演进、执行路径、数学推导、方法对比、论文证据或代码调用链中的哪一种主导；可以混合，但不要让所有笔记长成同一套章节。
 
 先讲清正文，再按目标压缩面试回答。需要校准讲解质量时读取 [exemplars.md](references/exemplars.md)，模仿其组织理由而非主题和措辞。
 
@@ -67,13 +69,15 @@ description: 生成或改写 HTML 学习笔记。技术主题使用 Deep Study�
 
 ### 7. Semantic Layout Mapping
 
-只在内容通过审查后，读取所选风格的布局文件和 [components.md](references/components.md) 对应部分。原因—结果用 flow，本质差异用 compare，条件分支用 table，执行顺序用 process，知识缺口用 transition。普通解释保留连贯段落。
+只在内容通过审查后，读取所选风格的布局文件和 [components.md](references/components.md) 对应部分。先根据知识关系选择整体叙事形状，再为局部内容选组件：原因—结果可用 flow，本质差异可用 compare，条件分支可用 table，执行顺序可用 process，来源中的关键视觉证据可用带出处的 figure。普通解释保留连贯段落；这些是可选工具，不是每篇都要凑齐的槽位。
 
-**完成条件：** 组件与知识关系对应；布局容纳正文，未反向删改关键内容。无需每节用齐组件。
+**完成条件：** 章节与组件由内容关系决定；连续多个板块没有因为套模板而重复同一种组织形式；布局容纳正文，未反向删改关键内容。
 
 ### 8. Render HTML
 
-复制所选模板到用户指定目录；未指定时用 `notes/<主题短名>/index.html`。读取模板 `<style>` 确认可用类名，替换标题、示例正文、目录、来源和占位符。Style B 的示例正文还在底部 `texts` 中，必须一并替换。
+复制所选模板到用户指定目录；未指定时用 `notes/<主题短名>/index.html`。读取模板 `<style>` 确认可用类名，将 `STUDY CONTENT` 区域视为空白画布，按已审查的内容重新组织，而不是保留示例章节骨架。目录只在长文确有跳转价值时出现；编号、导读、总结、面试卡均按需使用。Style B 的示例正文还在底部 `texts` 中，必须一并替换。
+
+Style C 的默认头部只显示标题和可选的领域标签。不得显示内部读者画像、生成目标、资料范围、时间预算或“本文将先……再……”式任务复述。来源仍应在相关图注或文末正常引用。复用来源图片时保存到输出目录的 `media/`，使用相对路径，不依赖易失效的远程热链。
 
 保留 A 的纸张／装订／write-in、B 的皮革／翻页系统；C 使用长文版式、稳定语义色、可读公式与代码。图标按需使用 Lucide / Remix Icon 或内联 SVG，不用 emoji 作装饰。C 可完全不用图标。
 
@@ -87,4 +91,4 @@ description: 生成或改写 HTML 学习笔记。技术主题使用 Deep Study�
 
 ## 最终交付
 
-交付完整笔记和可点击文件路径，不只给提纲；默认不展示内部章节蓝图、草稿过程或审查表。笔记包含大图景、阅读优先级、连贯正文、必要来源与紧凑回顾，面试内容按需出现。多文件输出提供入口和前后链接。说明实际做过的验证和仍影响阅读的限制，未运行的代码不声称已测试。
+交付完整笔记和可点击文件路径，不只给提纲；不展示内部 brief、章节蓝图、深度计划、草稿过程或审查表。笔记用适合主题的方式建立大图景，正文连贯，来源可核查；优先级、目录、紧凑回顾和面试内容按需出现。多文件输出提供入口和前后链接。说明实际做过的验证和仍影响阅读的限制，未运行的代码不声称已测试。
