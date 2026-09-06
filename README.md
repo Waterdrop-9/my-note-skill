@@ -30,7 +30,8 @@ Deep Technical Study Notes + Visual Note Generator
 | Interview-aware | CORE / FOLLOW-UP / OPTIONAL 分层；面试回答是正文的压缩，有理由和边界 |
 | Content QA | 正文在排版前通过内容 P0 审查，失败先改正文 |
 | Visual evidence | 关键架构图、曲线、表格或界面可直接复用／截取并本地保存，图注说明来源和读法 |
-| Semantic layout | 先选问题演进、执行路径、数学推导、方法对比、论文证据或代码调用链，再按局部语义选择组件 |
+| Semantic layout | 章节组合随知识关系变化；内容审查后主动识别重点，使用稳定语义色、局部标签与现有组件 |
+| Visual QA | 检查重点是否易找、正文是否实际使用语义组件，以及长文停顿、机械重复与过度装框 |
 
 “提高稳定性”“提升效率”不算解释完成：要继续说明哪个量或步骤改变了，为什么有效，以及不这样做会怎样。难但决定理解的内容不能因为难而放进选读；独立路线也不会被硬写成一条历史进化链。
 
@@ -94,12 +95,14 @@ git clone https://github.com/Unclecheng-li/note-skill.git ~/.workbuddy/skills/no
 
 | 颜色 | 稳定语义 | 组件例子 |
 | --- | --- | --- |
-| 蓝 | 解释与结构 | compare-card、summary-card、表头 |
+| 蓝 | 结构说明与比较 | compare-card、summary-card、表头 |
 | 青 | 承上启下与流程 | transition-card、process-card、flow-box |
 | 橙 | 核心洞察 | key-insight |
 | 红 | 误解、警告与面试 | misconception-card、interview-card |
 | 绿 | 解法与正面结果 | solution-card |
 | 紫 | 高级推导与扩展 | derivation-note、optional-note |
+
+章节组织灵活，视觉语言稳定：组件不是必填槽位，也不能全部省略。普通解释用连续段落；核心洞察、误区、流程和回顾主动突出，同义组件可重复，避免的是每节机械重复相同组合。不设组件数量或比例。
 
 所有提示卡共用基础样式；流程、对比、代码、总结沿用原接口，并新增带图注和来源的 figure。模板只提供视觉原语，不规定文章大纲：目录、编号、导读、总结和面试卡都按内容与目标选用。颜色配合文字标题，不用颜色代替优先级判断。公式采用固定版本 KaTeX，宽表、公式、代码和来源大图在窄屏局部滚动或打开原尺寸。
 

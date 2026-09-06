@@ -73,6 +73,10 @@
     margin: 22px 0; padding: 19px 23px; border-left: 3px solid var(--card-accent);
     background: var(--card-bg); border-radius: 0 7px 7px 0;
   }
+  .study-note, .study-label { --card-accent: var(--ink-blue); --card-bg: var(--blue-bg); }
+  .study-note { border-left: 3px solid var(--card-accent); padding: 4px 0 4px 18px; margin: 26px 0; }
+  .study-note > :last-child { margin-bottom: 0; }
+  .study-label { display: inline-block; color: var(--card-accent); background: var(--card-bg); font: 700 .78rem/1.7 var(--font-body); padding: 2px 8px; border-radius: 4px; margin-right: 7px; vertical-align: baseline; }
   .card-title { color: var(--card-accent); font: 700 .88rem/1.65 var(--font-body); margin: 0 0 9px; }
   .study-card > :last-child, .compare-box > :last-child, .summary-box > :last-child { margin-bottom: 0; }
   .transition-card, .process-card { --card-accent: var(--ink-teal); --card-bg: var(--teal-bg); }
@@ -103,7 +107,9 @@
   caption { text-align: left; font-weight: 700; margin-bottom: 10px; }
   th, td { text-align: left; vertical-align: top; padding: 12px 14px; border-bottom: 1px solid var(--border); }
   thead th { color: var(--ink-blue); background: var(--blue-bg); font-size: .81rem; }
-  tbody th { font-weight: 500; }
+  tbody th { font-weight: 700; color: var(--ink-blue); background: var(--blue-bg); }
+  .mechanism-table code, .mechanism-table .katex { white-space: nowrap; }
+  tbody + tbody { border-top: 2px solid var(--border); }
   code, pre { font-family: var(--font-code); }
   code { font-size: .86em; }
   :not(pre) > code, .code-term { background: #efeee9; padding: 2px 5px; border-radius: 3px; }
@@ -127,6 +133,7 @@
     .compare-row { grid-template-columns: 1fr; gap: 4px; }
     .symbols { column-gap: 12px; font-size: .9rem; }
     .mechanism-table { min-width: 560px; }
+    .table-scroll::before { content: "表格可横向滚动 →"; display: block; color: var(--ink-muted); font-size: .78rem; margin-bottom: 8px; }
     th, td { padding: 10px; }
     .code-block { padding: 17px; }
   }
@@ -149,12 +156,22 @@
     thead { display: table-header-group; }
     tr { break-inside: avoid; }
   }
+  .qa-answer { margin-top: 10px; }
+  .qa-answer > summary { cursor: pointer; color: var(--ink-red); font-weight: 600; width: fit-content; padding: 4px 10px; border: 1px solid currentColor; border-radius: 5px; }
+  .qa-answer > summary:focus-visible { outline: 2px solid var(--ink-blue); outline-offset: 3px; }
+  .qa-answer .qa-hide, .qa-answer[open] .qa-show { display: none; }
+  .qa-answer[open] .qa-hide { display: inline; }
+  .qa-answer > .qa-body { margin-top: 12px; }
+  .qa-answer > .qa-body > :last-child { margin-bottom: 0; }
+  .qa-item + .qa-item { margin-top: 22px; }
+  .qa-question { font-weight: 700; margin-bottom: 0; }
+  @media print { .qa-answer > summary { display: none; } }
 </style>
 </head>
 <body>
 <a class="skip-link" href="#main">跳到正文</a>
 <div class="notebook">
-<!-- STUDY CONTENT START: this is a blank composition canvas, not a required outline. -->
+<!-- STUDY CONTENT START: compose sections freely; preserve semantic visual primitives, not a fixed outline. -->
 <header class="study-header">
   <p class="eyebrow">DEEP STUDY / [可选领域标签]</p>
   <h1>[笔记标题]</h1>
@@ -162,10 +179,14 @@
 <main id="main" class="content">
   <!-- Choose sections from the subject's real logic. A derivation, execution trace,
        comparison, source figure or continuous prose can lead; numbering and TOC are optional.
-       Keep audience assumptions, generation goals and planning metadata out of the page. -->
+       After content QA, identify insights, misconceptions, formulas, branches, processes,
+       transitions and review answers; give each important point a visible semantic anchor.
+       Reuse same-meaning components; vary combinations with the content. Examples live in references.
+       Keep audience assumptions, generation goals and planning metadata out of the page;
+       retain reader-facing learning labels, sources and figure captions. -->
   <section class="section" id="start">
     <h2 class="section-title">[从当前主题最自然的问题、现象或证据开始]</h2>
-    <p>[在这里放通过内容审查的正文；按需使用 references 中的组件，不复制固定组合。]</p>
+    <p>[放入已审查正文并落实语义映射：普通解释用段落，重点用现有组件或局部标签／边线；组合随内容决定。]</p>
   </section>
   <section class="section sources" id="sources">
     <h2 class="section-title">参考资料</h2>
@@ -178,6 +199,16 @@
 <noscript><p class="render-notice">JavaScript 未启用：正文可读，公式保留 TeX 表达式。</p></noscript>
 </div>
 <script>
+  // Print all answers, then restore the reader's individual disclosure states.
+  let printClosedAnswers = [];
+  window.addEventListener('beforeprint', function () {
+    printClosedAnswers = Array.from(document.querySelectorAll('details.qa-answer:not([open])'));
+    printClosedAnswers.forEach(answer => { answer.open = true; });
+  });
+  window.addEventListener('afterprint', function () {
+    printClosedAnswers.forEach(answer => { answer.open = false; });
+    printClosedAnswers = [];
+  });
   document.addEventListener('DOMContentLoaded', function () {
     const main = document.querySelector('main');
     const status = document.getElementById('math-status');

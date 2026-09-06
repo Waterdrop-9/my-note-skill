@@ -5,7 +5,7 @@ description: 生成或改写 HTML 学习笔记。技术主题使用 Deep Study�
 
 # note-skill · Deep Technical Study Notes + Visual Notes
 
-先组织知识和教学逻辑，再将理解结构渲染成笔记。降低语言理解成本，保留决定理解的机制、数学、实现和边界。
+先组织知识和教学逻辑，再将理解结构渲染成笔记。章节组织灵活，语义视觉表达稳定：重点容易识别，长文有阅读节奏，保留决定理解的机制、数学、实现和边界。
 
 **内容正确性与理解完整性优先于视觉紧凑。** 不得为固定页高、整齐卡片或短篇幅删除关键解释；按 [视觉检查清单](references/checklist.md) 拆页或拆节。
 
@@ -16,6 +16,8 @@ description: 生成或改写 HTML 学习笔记。技术主题使用 Deep Study�
 | A · 学霸笔记 | 轻量总结、非技术笔记，或明确要求手写风格 | [template.html](assets/template.html) | [layouts.md](references/layouts.md) |
 | B · 手账 / Journal | 明确要求皮革本、手账、翻页 | [template-journal.html](assets/template-journal.html) | [layouts-journal.md](references/layouts-journal.md) |
 | C · Deep Study | 系统学习技术主题、理解算法或机制、技术面试复习 | [template-deep-study.html](assets/template-deep-study.html) | [layouts-deep-study.md](references/layouts-deep-study.md) |
+
+本 Skill 的规则适用于不同主题；先按当前主题选择适用的教学与技术检查。references、模板片段和 examples 中的具体主题仅作 few-shot，不继承其章节、术语、公式或知识点清单；正文内容由本次主题、读者起点与资料决定。
 
 用户指定的风格优先。技术深度与视觉风格独立：技术学习即使选 A/B，也走内容流程；仅美化已有笔记时保留其事实与范围，流程可以轻量执行，不强加推导和面试题。
 
@@ -69,13 +71,13 @@ description: 生成或改写 HTML 学习笔记。技术主题使用 Deep Study�
 
 ### 7. Semantic Layout Mapping
 
-只在内容通过审查后，读取所选风格的布局文件和 [components.md](references/components.md) 对应部分。先根据知识关系选择整体叙事形状，再为局部内容选组件：原因—结果可用 flow，本质差异可用 compare，条件分支可用 table，执行顺序可用 process，来源中的关键视觉证据可用带出处的 figure。普通解释保留连贯段落；这些是可选工具，不是每篇都要凑齐的槽位。
+内容通过审查后，读取所选风格的布局文件和 [components.md](references/components.md) 对应部分。先识别关键洞察、危险误解、核心公式、条件分支、算法流程、重要转折、追问与回顾答案，再逐处选择呈现方式。章节顺序与内容组合由知识关系决定；相同语义采用一致、可辨识的视觉表达。普通解释保持连贯段落，重点主动使用现有组件或标题、短标签、留白、边线。组件不是必填槽位，也不能因此全部省略；具体语义映射与组合示例见布局文件。
 
-**完成条件：** 章节与组件由内容关系决定；连续多个板块没有因为套模板而重复同一种组织形式；布局容纳正文，未反向删改关键内容。
+**完成条件：** 已识别重点均有读者可见的视觉落点；同义组件可以复用，章节没有机械重复相同组合，普通解释与结论／补充层级清楚；布局容纳完整正文。
 
 ### 8. Render HTML
 
-复制所选模板到用户指定目录；未指定时用 `notes/<主题短名>/index.html`。读取模板 `<style>` 确认可用类名，将 `STUDY CONTENT` 区域视为空白画布，按已审查的内容重新组织，而不是保留示例章节骨架。目录只在长文确有跳转价值时出现；编号、导读、总结、面试卡均按需使用。Style B 的示例正文还在底部 `texts` 中，必须一并替换。
+复制所选模板到用户指定目录；未指定时用 `notes/<主题短名>/index.html`。读取模板 `<style>` 确认可用类名，`STUDY CONTENT` 是章节组织的空白画布，保留模板视觉原语，并落实上一步的语义映射；不沿用示例章节骨架。目录只在长文确有跳转价值时出现；编号、导读、总结、面试卡均按需使用。Style B 的示例正文还在底部 `texts` 中，必须一并替换。
 
 Style C 的默认头部只显示标题和可选的领域标签。不得显示内部读者画像、生成目标、资料范围、时间预算或“本文将先……再……”式任务复述。来源仍应在相关图注或文末正常引用。复用来源图片时保存到输出目录的 `media/`，使用相对路径，不依赖易失效的远程热链。
 
@@ -85,7 +87,7 @@ Style C 的默认头部只显示标题和可选的领域标签。不得显示内
 
 ### 9. Final QA
 
-内容变动后重查 [content-checklist.md](references/content-checklist.md) 受影响项；同时执行 [checklist.md](references/checklist.md) 的通用项及所选风格项。有浏览器时实际预览桌面与窄屏，检查长公式、表格、代码、目录和交互；只有静态检查时如实说明尚未验证的项目。
+内容变动后重查 [content-checklist.md](references/content-checklist.md) 受影响项；再执行 [checklist.md](references/checklist.md) 的通用项及所选风格项，特别核对重点可发现性、语义色与正文组件实际使用，而非仅检查 CSS 存在。有浏览器时实际预览桌面与窄屏，检查长公式、表格、代码、目录和交互；只有静态检查时如实说明尚未验证的项目。
 
 **完成条件：** 内容与视觉检查均通过。存在未解决的内容 P0 时不宣称成稿通过；可说明缺口并交付明确标注的草稿。
 

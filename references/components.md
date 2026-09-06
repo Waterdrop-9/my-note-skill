@@ -116,14 +116,14 @@ Style A 的内容元素使用 `.write-in` 类实现"书写出现"效果；Style 
 
 ## Style C · 稳定语义与复用组件
 
-技术内容先通过 [内容审查](content-checklist.md)，再按 [Deep Study 布局](layouts-deep-study.md) 映射。组件是按需调用的词汇，不是输出清单；不要求每篇出现固定组合，也不要求每节都有卡片。C 的提示卡共享 `.study-card` 基础样式，不为每种语义重复实现容器。
+技术内容先通过 [内容审查](content-checklist.md)，再按 [Deep Study 布局](layouts-deep-study.md) 映射。组件是表达已识别语义的词汇，不是输出清单。内容中出现需要强调的洞察、误区、流程或回顾时，主动选用对应表达；不要求固定组合或每节都有卡片，也不能把“按需”执行成全文省略视觉锚点。C 的提示卡共享 `.study-card` 基础样式，不为每种语义重复实现容器。
 
 | 语义 | 类名 | 颜色／结构 | 复用关系 |
 | --- | --- | --- | --- |
-| 普通解释／结构 | `.study-card` | 蓝色 | 基础提示卡 |
+| 结构说明／知识整理 | `.study-card` | 蓝色 | 基础提示卡；普通解释用段落 |
 | 承上启下 | `.study-card.transition-card` | 青色 | 同一基础卡片 |
 | 关键洞察 | `.study-card.key-insight` | 橙色 | 同一基础卡片 |
-| 误解／警告 | `.study-card.misconception-card` | 红色 | 同一基础卡片 |
+| 误解／重要边界 | `.study-card.misconception-card` | 红色 | 同一基础卡片 |
 | 面试压缩 | `.study-card.interview-card` | 红色 | 同一基础卡片；回答回链正文 |
 | 选读扩展 | `.study-card.optional-note` | 紫色 | 同一基础卡片 |
 | 必要高级推导 | `.study-card.derivation-note` | 紫色 | 同一基础卡片；不因此降为选读 |
@@ -137,6 +137,30 @@ Style A 的内容元素使用 `.write-in` 类实现"书写出现"效果；Style 
 | 条件分支 | `.table-scroll` > `.mechanism-table` | 蓝色表头 | 原生 table，窄屏局部横滚 |
 | 代码 | `pre.code-block` > `code` | 深色／等宽 | 复用原代码接口，保留缩进 |
 
-颜色功能稳定，卡片标题同时用文字表达用途。优先级使用 `.priority.core`、`.priority.follow-up`、`.priority.optional` 的可读标签；颜色不自动决定知识优先级。
+颜色功能稳定，标题同时明确写出“关键洞察”“易错点”“成立条件”“执行流程”“面试回答”等用途。红色边界与面试、紫色推导与扩展等共色功能必须由文字区分。
+
+强调有轻重：短提示用 `.study-label` 配语义类（如 `key-insight`），连续推导的关键条件可用 `.study-note` 配语义类保留边线与留白；需要独立停读、复习回找的解释用 `.study-card`。三者共享既有语义色，不另建主题配色。标题／粗体也可以承担强调，普通段落不用套蓝卡。
+
+学习提示属于读者界面，和内部 brief 分开：局部显示“关键洞察／易错点／成立条件／追问／选读”；优先级用 `.priority.core`、`.priority.follow-up`、`.priority.optional`，可附“核心／追问／选读”中文。按学习价值分级，紫色必要推导仍可为 CORE；读者画像、默认目标、时间预算、资料范围、生成策略继续隐藏，正常出处和图注保留。
 
 标题、正文、代码字体及六组语义色统一在 [Style C 模板](../assets/template-deep-study.html) 的 `:root` 中维护。不要为了视觉变化随意换颜色，或给每段添加提示卡。需要更多视觉变化时优先改变信息形状，例如来源图、流程、推导、对比或连续正文，而不是继续堆不同颜色的盒子。
+
+
+### 自测问答：先作答，再揭晓
+
+HTML 自测题与面试问答使用独立的原生 `details.qa-answer`，省略 `open`，答案默认折叠。问题完整显示在折叠区域外；`summary` 是“查看答案／收起答案”控件，每题独立开合，可同时展开多题。复用现有卡片与标签，不把答案要点泄露在题目旁。正文的必要解释、推导与边界保持可见；这里只隐藏已在正文讲过的自测答案。
+
+```html
+<aside class="study-card interview-card">
+  <h3 class="card-title">自测</h3>
+  <div class="qa-item">
+    <p class="qa-question">缓存容量足够，为什么仍可能频繁未命中？</p>
+    <details class="qa-answer">
+      <summary><span class="qa-show">查看答案</span><span class="qa-hide">收起答案</span></summary>
+      <div class="qa-body"><p>容量只是一个条件；还要结合访问局部性、淘汰策略与失效行为判断。回答应回到正文已解释的机制。</p></div>
+    </details>
+  </div>
+</aside>
+```
+
+Style C 模板提供控件样式与打印处理：打印时展开答案，结束后恢复原状态。保留原生键盘交互、展开标记和焦点样式，无需框架。折叠中的公式仍随正文进行初始化；检查展开后的公式、代码和表格。其他 HTML 风格生成自测时复用这一结构，配色沿用所选风格。
